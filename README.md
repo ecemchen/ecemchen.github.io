@@ -1,6 +1,4 @@
 # ecemchen.github.io
-test test
-![plankton](https://github.com/user-attachments/assets/818992d5-1a73-4894-86df-708346f87c72)
 ![1](https://github.com/user-attachments/assets/c72af4f3-7225-4484-ac0c-42fcd845d56a)
 ![2](https://github.com/user-attachments/assets/ef7170b2-afc4-41b3-b4df-5ea6371aba66)
 ![3](https://github.com/user-attachments/assets/b90b99f3-202e-4911-a54e-ba4a328297ad)
