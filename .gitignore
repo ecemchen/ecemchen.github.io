@@ -1,0 +1,47 @@
+# Gradle files
+.gradle/
+build/
+*.gradle
+.gradle-cache/
+.gradle-private/
+
+# Local configuration
+local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+
+# Android build artifacts
+/captures
+/.cxx
+/externalNativeBuild
+/.gradle
+
+# IntelliJ IDEA files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Log files
+*.log
+
+# Temporary or swap files
+*.tmp
+*.swp
+
+# APK and other binary files
+*.apk
+*.ap_
+*.dex
+*.so
+*.jar
+
+# Generated files
+/generated/
+bin/
+gen/
