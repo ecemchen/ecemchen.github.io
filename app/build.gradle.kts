@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.common.ktx)
 
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")

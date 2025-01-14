@@ -19,4 +19,14 @@ interface ZodiacApi {
         @Query("sign") sign: String,
         @Query("day") day: String
     ): ZodiacResponse
+
+    @GET("get-horoscope/weekly")
+    suspend fun getWeeklyZodiacAdvice(
+        @Query("sign") sign: String,
+    ): ZodiacResponse
+
+    @GET("get-horoscope/monthly")
+    suspend fun getMonthlyZodiacAdvice(
+        @Query("sign") sign: String,
+    ): ZodiacResponse
 }
