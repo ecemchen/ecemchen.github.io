@@ -22,11 +22,11 @@ interface ZodiacApi {
 
     @GET("get-horoscope/weekly")
     suspend fun getWeeklyZodiacAdvice(
-        @Query("sign") sign: String
+        @Query("sign") sign: String,
     ): ZodiacResponse
 
     @GET("get-horoscope/monthly")
     suspend fun getMonthlyZodiacAdvice(
-        @Query("sign") sign: String
+        @Query("sign") sign: String,
     ): ZodiacResponse
 }

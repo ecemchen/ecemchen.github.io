@@ -8,6 +8,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import dev.christina.moonapp.data.db.MoonDatabase
 import dev.christina.moonapp.repository.MoonRepository
 import dev.christina.moonapp.repository.NoteRepository
@@ -15,8 +18,13 @@ import dev.christina.moonapp.ui.*
 import dev.christina.moonapp.ui.theme.MoonAppTheme
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        firebaseAnalytics = Firebase.analytics
 
         val database = MoonDatabase.getDatabase(this)
         val moonRepository = MoonRepository(database.moonDao())
@@ -36,7 +44,26 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
     val moonViewModel: MoonViewModel = viewModel(factory = ViewModelFactoryProvider(moonRepository))
     val noteViewModel: NoteViewModel = viewModel(factory = NoteViewModelFactoryProvider(noteRepository))
 
-    NavHost(navController = navController, startDestination = "zodiacScreen") {
+    NavHost(navController = navController, startDestination = "welcomeScreen") {
+
+        composable("welcomeScreen") {
+            WelcomeScreen(navController)
+        }
+
+        composable("registerScreen") {
+            RegisterScreen(navController)
+        }
+
+        composable("secondScreen/{userName}") { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("userName")
+            SecondScreen(navController, moonViewModel, date = null, noteViewModel)
+        }
+
+        composable("loginScreen") {
+            LoginScreen(navController)
+        }
+
+
         composable("zodiacScreen") {
             ZodiacScreen(navController, moonViewModel)
         }

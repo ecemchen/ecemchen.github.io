@@ -15,6 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MoonApp"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.gms.auth.api.signin.default_web_client_id"
+            android:value="@string/default_web_client_id" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,7 +27,6 @@
             android:theme="@style/Theme.MoonApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
