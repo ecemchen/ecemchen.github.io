@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -32,6 +33,8 @@ import dev.christina.moonapp.data.db.NoteEntity
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +48,8 @@ fun SecondScreen(
     val moonEntity = allMoonPhases[date]
     val selectedZodiac = viewModel.selectedZodiac.collectAsState().value
     val zodiacAdvice = viewModel.zodiacAdvice.collectAsState().value
+    val weeklyZodiacAdvice = viewModel.weeklyZodiacAdvice.collectAsState().value
+    val monthlyZodiacAdvice = viewModel.monthlyZodiacAdvice.collectAsState().value
     val isLoadingAdvice = viewModel.isLoadingAdvice.collectAsState().value
 
     LaunchedEffect(selectedZodiac, date) {
@@ -61,6 +66,24 @@ fun SecondScreen(
     val noteInput = remember { mutableStateOf("") }
     val editingNote = remember { mutableStateOf<NoteEntity?>(null) }
     val isFavorite = viewModel.moonList.collectAsState().value.contains(moonEntity)
+// Track the selected option (Daily, Weekly, or Monthly)
+    val selectedOption = remember { mutableStateOf("Daily") }
+    val dateRange = remember { mutableStateOf("") }
+    val currentMonth = remember { mutableStateOf("") }
+
+// Calculate Weekly Range or Month Name Dynamically
+    LaunchedEffect(selectedOption.value, date) {
+        if (selectedOption.value == "Weekly" && date != null) {
+            val localDate = LocalDate.parse(date)
+            val startOfWeek = localDate.with(java.time.DayOfWeek.MONDAY)
+            val endOfWeek = localDate.with(java.time.DayOfWeek.SUNDAY)
+            dateRange.value = "${startOfWeek.dayOfMonth}.${startOfWeek.monthValue}.${startOfWeek.year} - " +
+                    "${endOfWeek.dayOfMonth}.${endOfWeek.monthValue}.${endOfWeek.year}"
+        } else if (selectedOption.value == "Monthly" && date != null) {
+            val localDate = LocalDate.parse(date)
+            currentMonth.value = localDate.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -181,29 +204,111 @@ fun SecondScreen(
                         Spacer(modifier = Modifier.height(24.dp))
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (selectedOption.value == "Daily") {
+                                Text(
+                                    text = dayOfWeek,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 20.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                                Text(
+                                    text = "$day",
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        fontWeight = FontWeight.Light,
+                                        fontSize = 80.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                                Text(
+                                    text = month.uppercase(),
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Light,
+                                        fontSize = 16.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                            } else if (selectedOption.value == "Weekly") {
+                                Text(
+                                    text = "Weekly Range",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 20.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = dateRange.value,
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        fontWeight = FontWeight.Light,
+                                        fontSize = 25.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                            } else if (selectedOption.value == "Monthly") {
+                                Text(
+                                    text = "Month",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 20.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = currentMonth.value.uppercase(),
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        fontWeight = FontWeight.Light,
+                                        fontSize = 25.sp,
+                                        color = Color.Black
+                                    )
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Underlines for Daily, Weekly, Monthly
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+                        ) {
                             Text(
-                                text = dayOfWeek,
+                                text = "Daily",
                                 style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 20.sp,
-                                    color = Color.Black
-                                )
+                                    textDecoration = if (selectedOption.value == "Daily") TextDecoration.Underline else TextDecoration.None,
+                                    color = if (selectedOption.value == "Daily") Color.Black else Color.Gray
+                                ),
+                                modifier = Modifier.clickable {
+                                    selectedOption.value = "Daily"
+                                    viewModel.fetchZodiacAdvice(selectedZodiac ?: "", date ?: "")
+                                }
                             )
+                            Spacer(modifier = Modifier.width(16.dp))
                             Text(
-                                text = "$day",
-                                style = MaterialTheme.typography.headlineLarge.copy(
-                                    fontWeight = FontWeight.Light,
-                                    fontSize = 80.sp,
-                                    color = Color.Black
-                                )
-                            )
-                            Text(
-                                text = month.uppercase(),
+                                text = "Weekly",
                                 style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Light,
-                                    fontSize = 50.sp,
-                                    color = Color.Black
-                                )
+                                    textDecoration = if (selectedOption.value == "Weekly") TextDecoration.Underline else TextDecoration.None,
+                                    color = if (selectedOption.value == "Weekly") Color.Black else Color.Gray
+                                ),
+                                modifier = Modifier.clickable {
+                                    selectedOption.value = "Weekly"
+                                    viewModel.fetchWeeklyZodiacAdvice(selectedZodiac ?: "", week = "1")
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = "Monthly",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    textDecoration = if (selectedOption.value == "Monthly") TextDecoration.Underline else TextDecoration.None,
+                                    color = if (selectedOption.value == "Monthly") Color.Black else Color.Gray
+                                ),
+                                modifier = Modifier.clickable {
+                                    selectedOption.value = "Monthly"
+                                    viewModel.fetchMonthlyZodiacAdvice(selectedZodiac ?: "")
+                                }
                             )
                         }
 
@@ -211,47 +316,20 @@ fun SecondScreen(
 
                         // Advice Section
                         Text(
-                            text = "ADVICE TODAY",
-                            style = MaterialTheme.typography.headlineLarge.copy(
-                                fontWeight = FontWeight.Light,
-                                fontSize = 30.sp,
-                                color = Color.Black
+                            text = when {
+                                isLoadingAdvice -> "Loading..."
+                                zodiacAdvice?.data != null -> "\"${zodiacAdvice.data.horoscope_data}\""
+                                weeklyZodiacAdvice?.data != null -> "\"${weeklyZodiacAdvice.data.horoscope_data}\""
+                                monthlyZodiacAdvice?.data != null -> "\"${monthlyZodiacAdvice.data.horoscope_data}\""
+                                else -> "Horoscope advice unavailable."
+                            },
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Normal,
+                                fontStyle = FontStyle.Italic,
+                                color = if (isLoadingAdvice) Color.Gray else Color.Black
                             ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            textAlign = TextAlign.Center
                         )
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 10.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isLoadingAdvice) {
-                                CircularProgressIndicator()
-                            } else if (zodiacAdvice?.data != null) {
-                                Text(
-                                    text = "\"${zodiacAdvice.data.horoscope_data}\"",
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = FontWeight.Normal,
-                                        fontStyle = FontStyle.Italic,
-                                        color = Color.Black
-                                    ),
-                                    textAlign = TextAlign.Center
-                                )
-                            } else {
-                                Text(
-                                    text = "Horoscope advice only available for the current date.",
-                                    style = MaterialTheme.typography.bodyLarge.copy(
-                                        fontWeight = FontWeight.Normal,
-                                        fontStyle = FontStyle.Italic,
-                                        color = Color.Gray
-                                    ),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
 
                         Spacer(modifier = Modifier.height(24.dp))
 
