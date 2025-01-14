@@ -42,6 +42,31 @@ class MoonRepository(private val moonDao: MoonDao) {
         moonDao.insertMoonPhases(moonPhases)
     }
 
+    // Fetch Weekly Zodiac Advice
+    suspend fun getWeeklyZodiacAdvice(sign: String): ZodiacResponse? {
+        return try {
+            Log.d("ZodiacAPI", "Fetching weekly advice for sign: $sign")
+            val response = RetrofitInstance.zodiacApi.getWeeklyZodiacAdvice(sign)
+            Log.d("ZodiacAPI", "API Response: $response")
+            response
+        } catch (e: Exception) {
+            Log.e("ZodiacAPI", "Error fetching weekly advice: ${e.message}")
+            null
+        }
+    }
+
+    suspend fun getMonthlyZodiacAdvice(sign: String): ZodiacResponse? {
+        return try {
+            Log.d("ZodiacAPI", "Fetching monthly advice for sign: $sign")
+            val response = RetrofitInstance.zodiacApi.getMonthlyZodiacAdvice(sign)
+            Log.d("ZodiacAPI", "API Response: $response")
+            response
+        } catch (e: Exception) {
+            Log.e("ZodiacAPI", "Error fetching monthly advice: ${e.message}")
+            null
+        }
+    }
+
 
     // Fetch Zodiac Advice
     suspend fun getZodiacAdvice(sign: String, day: String): ZodiacResponse? {
