@@ -30,6 +30,13 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
     private val _isLoadingAdvice = MutableStateFlow(false)
     val isLoadingAdvice: StateFlow<Boolean> = _isLoadingAdvice
 
+    private val _weeklyZodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
+    val weeklyZodiacAdvice: StateFlow<ZodiacResponse?> = _weeklyZodiacAdvice
+
+    private val _monthlyZodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
+    val monthlyZodiacAdvice: StateFlow<ZodiacResponse?> = _monthlyZodiacAdvice
+
+
     fun fetchMoonPhasesForMonth(yearMonth: YearMonth) {
         viewModelScope.launch {
             repository.fetchAndSaveMoonPhasesForMonth(yearMonth)
@@ -71,6 +78,8 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
             val advice = repository.getZodiacAdvice(sign = sign, day = date)
             Log.d("ZodiacAdvice", "Fetched advice: $advice")
             _zodiacAdvice.value = advice
+            _weeklyZodiacAdvice.value = null
+            _monthlyZodiacAdvice.value = null
             _isLoadingAdvice.value = false
         }
     }
@@ -80,4 +89,42 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
             _moonList.value = _moonList.value + moonEntity
         }
     }
+
+    fun fetchWeeklyZodiacAdvice(sign: String, week: String) {
+        viewModelScope.launch {
+            _isLoadingAdvice.value = true
+            try {
+                Log.d("WeeklyZodiacAdvice", "Fetching weekly horoscope for sign: $sign")
+                val advice = repository.getWeeklyZodiacAdvice(sign = sign)
+                Log.d("WeeklyZodiacAdvice", "Fetched advice: $advice")
+                _weeklyZodiacAdvice.value = advice
+                _monthlyZodiacAdvice.value = null
+                _zodiacAdvice.value = null
+            } catch (e: Exception) {
+                Log.e("WeeklyZodiacAdvice", "Error fetching weekly advice: ${e.message}")
+            } finally {
+                _isLoadingAdvice.value = false
+            }
+        }
+    }
+
+
+    fun fetchMonthlyZodiacAdvice(sign: String) {
+        viewModelScope.launch {
+            _isLoadingAdvice.value = true
+            try {
+                Log.d("MonthlyZodiacAdvice", "Fetching monthly horoscope for sign: $sign")
+                val advice = repository.getMonthlyZodiacAdvice(sign = sign)
+                Log.d("MonthlyZodiacAdvice", "Fetched advice: $advice")
+                _monthlyZodiacAdvice.value = advice
+                _weeklyZodiacAdvice.value = null
+                _zodiacAdvice.value = null
+            } catch (e: Exception) {
+                Log.e("MonthlyZodiacAdvice", "Error fetching monthly advice: ${e.message}")
+            } finally {
+                _isLoadingAdvice.value = false
+            }
+        }
+    }
+
 }
