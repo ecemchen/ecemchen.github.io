@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "555766041945",
+    "project_id": "moonapp-ad99c",
+    "storage_bucket": "moonapp-ad99c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555766041945:android:d8992dfa6f8f3cf9fe1048",
+        "android_client_info": {
+          "package_name": "dev.christina.moonapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1XR3qivdQMf8UMo_GmihLPJVtkGwe-LQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
