@@ -71,6 +71,11 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             SecondScreen(navController, moonViewModel, LocalDate.now().toString(), noteViewModel, null)
         }
 
+        composable("profileSettingsScreen") {
+            ProfileSettingsScreen(navController, moonViewModel)
+        }
+
+
         composable(
             route = "secondScreen/{email}",
             arguments = listOf(navArgument("email") { type = NavType.StringType })
