@@ -56,7 +56,7 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
         }
 
         composable("loginScreen") {
-            LoginScreen(navController)
+            LoginScreen(navController, moonViewModel)
         }
         composable("zodiacScreen") {
             ZodiacScreen(navController, moonViewModel)

@@ -15,12 +15,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, moonViewModel: MoonViewModel) {
     val context = LocalContext.current
     val firebaseAuth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -83,7 +85,34 @@ fun LoginScreen(navController: NavController) {
                                 firebaseAuth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            navController.navigate("secondScreen/${email}")
+                                            val user = task.result?.user
+                                            user?.let {
+                                                // Fetch user's zodiac sign from Firestore
+                                                firestore.collection("users").document(it.uid).get()
+                                                    .addOnSuccessListener { document ->
+                                                        val zodiacSign =
+                                                            document.getString("zodiacSign")
+                                                        if (zodiacSign != null) {
+                                                            moonViewModel.setSelectedZodiac(
+                                                                zodiacSign
+                                                            ) // Set zodiac in ViewModel
+                                                            navController.navigate("secondScreen/${email}")
+                                                        } else {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Failed to retrieve user data",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    }
+                                                    .addOnFailureListener {
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Error fetching user data",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
+                                            }
                                         } else {
                                             Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
                                         }
