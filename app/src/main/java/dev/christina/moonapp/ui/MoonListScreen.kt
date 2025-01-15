@@ -82,6 +82,9 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigationBar(navController = navController, currentScreen = "moonList")
         }
     ) { padding ->
         Column(

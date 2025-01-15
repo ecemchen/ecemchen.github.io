@@ -81,22 +81,12 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "PROFILE SETTINGS",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Normal,
-                            color = Color.Black
-                        )
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
-                    }
-                },
+                title = { Text("PROFILE SETTINGS", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Normal, color = Color.Black)) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
             )
+        },
+        bottomBar = {
+            BottomNavigationBar(navController = navController, currentScreen = "profileSettingsScreen")
         }
     ) { padding ->
         Box(
@@ -115,6 +105,13 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    successMessage?.let { message ->
+                        Text(
+                            text = message,
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                     // Email Section
                     Text(
                         text = "Your mail:",
@@ -273,9 +270,6 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     ) {
                         Text("Save Changes", color = Color.White)
                     }
-
-
-
                     OutlinedButton(
                         onClick = {
                             firebaseAuth.signOut()
