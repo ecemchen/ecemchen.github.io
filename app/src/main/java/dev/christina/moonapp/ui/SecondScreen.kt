@@ -59,7 +59,6 @@ fun SecondScreen(
     val currentDate = date ?: LocalDate.now().toString()
     val allMoonPhases = viewModel.allMoonPhases.collectAsState(emptyMap()).value
     val moonEntity = allMoonPhases[currentDate]
-    Log.d("SecondScreen", "MoonEntity for $currentDate: $moonEntity")
 
     val selectedZodiac = viewModel.selectedZodiac.collectAsState().value
     Log.d("SecondScreen", "Selected Zodiac: $selectedZodiac")
@@ -68,10 +67,6 @@ fun SecondScreen(
     val monthlyZodiacAdvice = viewModel.monthlyZodiacAdvice.collectAsState().value
     val isLoadingAdvice = viewModel.isLoadingAdvice.collectAsState().value
 
-    //Add these logs:
-    Log.d("SecondScreen", "Current Date: $currentDate")
-    Log.d("SecondScreen", "All Moon Phases: $allMoonPhases")
-    Log.d("SecondScreen", "MoonEntity for Date: $moonEntity")
 
     // Track notes
     val notes = noteViewModel.notesForDate.collectAsState().value
@@ -86,8 +81,7 @@ fun SecondScreen(
 
     // Fetch zodiac advice when selectedZodiac or date changes
     LaunchedEffect(selectedZodiac, currentDate) {
-        Log.d("SecondScreen", "Displaying data for date=$currentDate")
-        if (!selectedZodiac.isNullOrBlank()) {
+          if (!selectedZodiac.isNullOrBlank()) {
             viewModel.fetchZodiacAdvice(selectedZodiac, currentDate)
         }
     }
@@ -100,14 +94,11 @@ fun SecondScreen(
     LaunchedEffect(Unit) {
         val yearMonth = YearMonth.now()
         viewModel.fetchMoonPhasesForMonth(yearMonth)
-        Log.d("SecondScreen", "Fetching moon phases for month: $yearMonth")
     }
 
     LaunchedEffect(Unit) {
         viewModel.logAllMoonPhases() // This will log all moon phases from the database
     }
-
-
 
 
     // Calculate Weekly Range or Month Name Dynamically
@@ -196,6 +187,9 @@ fun SecondScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigationBar(navController = navController, currentScreen = "secondScreen")
         }
     ) { padding ->
         Box(
@@ -515,3 +509,42 @@ fun getMoonPhaseImageResource(phase: String): Int {
         else -> R.drawable.ic_launcher_foreground
     }
 }
+
+@Composable
+fun BottomNavigationBar(navController: NavController, currentScreen: String) {
+    BottomAppBar(
+        containerColor = Color(0xFFD3D3D3),
+        modifier = Modifier.height(64.dp)
+    ) {
+        val items = listOf(
+            BottomNavItem("Horoscope", R.drawable.horoscope, "secondScreen"),
+            BottomNavItem("Calendar", R.drawable.calendar, "moonList"),
+            BottomNavItem("Profile", R.drawable.user, "profileSettingsScreen")
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEach { item ->
+                IconButton(
+                    onClick = {
+                        if (currentScreen != item.route) {
+                            navController.navigate(item.route)
+                        }
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = item.icon),
+                        contentDescription = item.label,
+                        tint = if (currentScreen == item.route) Color.Black else Color.Gray,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+data class BottomNavItem(val label: String, val icon: Int, val route: String)
+

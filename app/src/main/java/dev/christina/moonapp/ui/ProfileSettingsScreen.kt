@@ -27,7 +27,7 @@ import androidx.compose.material.icons.filled.Edit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileSettingsScreen(navController: NavController) {
+fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewModel) {
     val context = LocalContext.current
     val firebaseAuth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
@@ -38,6 +38,7 @@ fun ProfileSettingsScreen(navController: NavController) {
     var isPasswordEditing by remember { mutableStateOf(false) }
     var isEmailEditing by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
 
     var selectedYear by remember { mutableStateOf(Calendar.getInstance().get(Calendar.YEAR)) }
     var selectedMonth by remember { mutableStateOf(Calendar.getInstance().get(Calendar.MONTH) + 1) }
@@ -57,6 +58,23 @@ fun ProfileSettingsScreen(navController: NavController) {
                 selectedMonth = month
                 selectedDay = day
             }
+        }
+    }
+
+    fun calculateZodiacSign(year: Int, month: Int, day: Int): String {
+        return when {
+            (month == 1 && day >= 20) || (month == 2 && day <= 18) -> "Aquarius"
+            (month == 2 && day >= 19) || (month == 3 && day <= 20) -> "Pisces"
+            (month == 3 && day >= 21) || (month == 4 && day <= 19) -> "Aries"
+            (month == 4 && day >= 20) || (month == 5 && day <= 20) -> "Taurus"
+            (month == 5 && day >= 21) || (month == 6 && day <= 20) -> "Gemini"
+            (month == 6 && day >= 21) || (month == 7 && day <= 22) -> "Cancer"
+            (month == 7 && day >= 23) || (month == 8 && day <= 22) -> "Leo"
+            (month == 8 && day >= 23) || (month == 9 && day <= 22) -> "Virgo"
+            (month == 9 && day >= 23) || (month == 10 && day <= 22) -> "Libra"
+            (month == 10 && day >= 23) || (month == 11 && day <= 21) -> "Scorpio"
+            (month == 11 && day >= 22) || (month == 12 && day <= 21) -> "Sagittarius"
+            else -> "Capricorn"
         }
     }
 
@@ -235,10 +253,16 @@ fun ProfileSettingsScreen(navController: NavController) {
                         onClick = {
                             isLoading = true
                             val birthdate = "$selectedYear-$selectedMonth-$selectedDay"
+                            val newZodiacSign = calculateZodiacSign(selectedYear, selectedMonth, selectedDay)
                             firestore.collection("users").document(user?.uid ?: "")
-                                .update("birthdate", birthdate)
+                                .update(mapOf("birthdate" to birthdate, "zodiacSign" to newZodiacSign))
                                 .addOnCompleteListener {
-                                    Toast.makeText(context, "Birthdate updated", Toast.LENGTH_SHORT).show()
+                                    if (it.isSuccessful) {
+                                        successMessage = "Birthdate successfully updated"
+                                        moonViewModel.setSelectedZodiac(newZodiacSign) // Update in ViewModel
+                                    } else {
+                                        successMessage = "Error updating birthdate"
+                                    }
                                     isLoading = false
                                 }
                         },
