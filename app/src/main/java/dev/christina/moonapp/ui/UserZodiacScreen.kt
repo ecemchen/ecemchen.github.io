@@ -22,25 +22,13 @@ fun UserZodiacScreen(navController: NavController, zodiacSign: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
             .padding(16.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
             verticalArrangement = Arrangement.SpaceAround, // Distributes items with equal spacing
             modifier = Modifier.fillMaxSize()
         ) {
-                text = "Your Zodiac Sign",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            Text(
-                text = zodiacSign,
-                style = MaterialTheme.typography.displayLarge.copy(fontSize = 32.sp),
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
             // Top content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
