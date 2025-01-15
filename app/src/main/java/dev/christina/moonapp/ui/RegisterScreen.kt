@@ -37,7 +37,6 @@ fun RegisterScreen(navController: NavController) {
 
     val daysInMonth = remember(selectedYear, selectedMonth) {
         Month.of(selectedMonth).length(java.time.Year.of(selectedYear).isLeap)
-
     }
 
     fun calculateZodiacSign(year: Int, month: Int, day: Int): String {
@@ -64,7 +63,7 @@ fun RegisterScreen(navController: NavController) {
                     Text(
                         text = "REGISTER",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Normal,
                             color = Color.Black
                         )
                     )
@@ -106,6 +105,16 @@ fun RegisterScreen(navController: NavController) {
                         modifier = Modifier.fillMaxWidth(0.8f),
                         visualTransformation = PasswordVisualTransformation()
                     )
+
+                    Text(
+                        text = "Select your birthdate",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                            .wrapContentWidth(Alignment.CenterHorizontally) // Center align text horizontally
+                    )
+
 
                     // Date Selection
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
