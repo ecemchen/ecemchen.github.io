@@ -1,5 +1,6 @@
 package dev.christina.moonapp.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.navigation.NavController
 import dev.christina.moonapp.R
 import dev.christina.moonapp.data.db.NoteEntity
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -44,34 +46,61 @@ fun SecondScreen(
     date: String?,
     noteViewModel: NoteViewModel
 ) {
+    val currentDate = date ?: LocalDate.now().toString()
     val allMoonPhases = viewModel.allMoonPhases.collectAsState(emptyMap()).value
-    val moonEntity = allMoonPhases[date]
+    val moonEntity = allMoonPhases[currentDate]
+    Log.d("SecondScreen", "MoonEntity for $currentDate: $moonEntity")
+
     val selectedZodiac = viewModel.selectedZodiac.collectAsState().value
+    Log.d("SecondScreen", "Selected Zodiac: $selectedZodiac")
     val zodiacAdvice = viewModel.zodiacAdvice.collectAsState().value
     val weeklyZodiacAdvice = viewModel.weeklyZodiacAdvice.collectAsState().value
     val monthlyZodiacAdvice = viewModel.monthlyZodiacAdvice.collectAsState().value
     val isLoadingAdvice = viewModel.isLoadingAdvice.collectAsState().value
 
-    LaunchedEffect(selectedZodiac, date) {
-        if (!selectedZodiac.isNullOrBlank() && !date.isNullOrBlank()) {
-            viewModel.fetchZodiacAdvice(sign = selectedZodiac, date = date)
-        }
-    }
+    //Add these logs:
+    Log.d("SecondScreen", "Current Date: $currentDate")
+    Log.d("SecondScreen", "All Moon Phases: $allMoonPhases")
+    Log.d("SecondScreen", "MoonEntity for Date: $moonEntity")
 
-    LaunchedEffect(date) {
-        date?.let { noteViewModel.fetchNotesForDate(it) }
-    }
-
+    // Track notes
     val notes = noteViewModel.notesForDate.collectAsState().value
     val noteInput = remember { mutableStateOf("") }
     val editingNote = remember { mutableStateOf<NoteEntity?>(null) }
     val isFavorite = viewModel.moonList.collectAsState().value.contains(moonEntity)
-// Track the selected option (Daily, Weekly, or Monthly)
+
+    // Option states for Daily, Weekly, Monthly advice
     val selectedOption = remember { mutableStateOf("Daily") }
     val dateRange = remember { mutableStateOf("") }
     val currentMonth = remember { mutableStateOf("") }
 
-// Calculate Weekly Range or Month Name Dynamically
+    // Fetch zodiac advice when selectedZodiac or date changes
+    LaunchedEffect(selectedZodiac, currentDate) {
+        Log.d("SecondScreen", "Displaying data for date=$currentDate")
+        if (!selectedZodiac.isNullOrBlank()) {
+            viewModel.fetchZodiacAdvice(selectedZodiac, currentDate)
+        }
+    }
+
+    // Track notes
+    LaunchedEffect(currentDate) {
+        noteViewModel.fetchNotesForDate(currentDate)
+    }
+
+    LaunchedEffect(Unit) {
+        val yearMonth = YearMonth.now()
+        viewModel.fetchMoonPhasesForMonth(yearMonth)
+        Log.d("SecondScreen", "Fetching moon phases for month: $yearMonth")
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.logAllMoonPhases() // This will log all moon phases from the database
+    }
+
+
+
+
+    // Calculate Weekly Range or Month Name Dynamically
     LaunchedEffect(selectedOption.value, date) {
         if (selectedOption.value == "Weekly" && date != null) {
             val localDate = LocalDate.parse(date)

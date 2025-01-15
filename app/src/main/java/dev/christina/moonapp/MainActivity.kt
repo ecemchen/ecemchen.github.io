@@ -16,6 +16,7 @@ import dev.christina.moonapp.repository.MoonRepository
 import dev.christina.moonapp.repository.NoteRepository
 import dev.christina.moonapp.ui.*
 import dev.christina.moonapp.ui.theme.MoonAppTheme
+import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
 
@@ -49,11 +50,9 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             WelcomeScreen(navController)
         }
         composable("registerScreen") {
-            RegisterScreen(navController)
+            RegisterScreen(navController, moonViewModel)
         }
-        composable("secondScreen") {
-            SecondScreen(navController, moonViewModel, date = null, noteViewModel)
-        }
+
         composable("loginScreen") {
             LoginScreen(navController)
         }
@@ -64,12 +63,18 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             val zodiac = backStackEntry.arguments?.getString("zodiac")
             FirstScreen(navController, moonViewModel, zodiac)
         }
+
+        composable("secondScreen") {
+            SecondScreen(navController, moonViewModel, date = LocalDate.now().toString(), noteViewModel)
+        }
+
         composable("moonList") {
             MoonListScreen(navController, moonViewModel)
         }
         composable("userZodiacScreen/{zodiacSign}") { backStackEntry ->
             val zodiacSign = backStackEntry.arguments?.getString("zodiacSign")
             zodiacSign?.let {
+                moonViewModel.setSelectedZodiac(it) // Save zodiac in ViewModel
                 UserZodiacScreen(navController, it)
             }
         }

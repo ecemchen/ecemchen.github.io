@@ -22,7 +22,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
     val context = LocalContext.current
     val firebaseAuth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
@@ -192,6 +192,7 @@ fun RegisterScreen(navController: NavController) {
                                                         navController.navigate("userZodiacScreen/$zodiacSign")
                                                     }
                                             }
+                                            moonViewModel.setSelectedZodiac(zodiacSign)
                                         } else {
                                             Toast.makeText(
                                                 context,

@@ -1,5 +1,6 @@
 package dev.christina.moonapp.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.christina.moonapp.data.db.NoteEntity
@@ -14,11 +15,14 @@ class NoteViewModel(private val noteRepository: NoteRepository) : ViewModel() {
 
     fun fetchNotesForDate(date: String) {
         viewModelScope.launch {
+            Log.d("NoteViewModel", "Fetching notes for date: $date")
             noteRepository.getNotesForDate(date).collect { notes ->
                 _notesForDate.value = notes
+                Log.d("NoteViewModel", "Fetched notes: $notes")
             }
         }
     }
+
 
     fun addNote(note: NoteEntity) {
         viewModelScope.launch {

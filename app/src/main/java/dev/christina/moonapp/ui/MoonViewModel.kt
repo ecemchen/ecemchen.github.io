@@ -46,8 +46,10 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
             )
             _savedMoonPhases.value = monthPhases
             _allMoonPhases.value = _allMoonPhases.value + monthPhases.associateBy { it.date }
+            Log.d("MoonViewModel", "Updated allMoonPhases: ${_allMoonPhases.value}")
         }
     }
+
 
 
     fun toggleMoonList(moonEntity: MoonEntity) {
@@ -127,4 +129,10 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
         }
     }
 
+    fun logAllMoonPhases() {
+        viewModelScope.launch {
+            val allPhases = repository.getAllMoonPhases()
+            Log.d("MoonViewModel", "All Moon Phases in DB: $allPhases")
+        }
+    }
 }

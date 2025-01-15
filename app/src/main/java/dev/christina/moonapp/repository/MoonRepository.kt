@@ -21,9 +21,12 @@ class MoonRepository(private val moonDao: MoonDao) {
 
     // Fetch moon phases from the API and save them to the database
     suspend fun fetchAndSaveMoonPhasesForMonth(yearMonth: YearMonth) {
-        val existingData = moonDao.getMoonPhasesForMonth(yearMonth.toString()).firstOrNull()
+        val monthStr = if (yearMonth.monthValue < 10) "0${yearMonth.monthValue}" else "${yearMonth.monthValue}"
+        val yearMonthString = "${yearMonth.year}-$monthStr"
 
+        val existingData = moonDao.getMoonPhasesForMonth(yearMonthString).firstOrNull()
         if (!existingData.isNullOrEmpty()) {
+            Log.d("MoonRepository", "Data already exists for $yearMonthString")
             return // Data already exists; no need to fetch
         }
 
@@ -39,8 +42,11 @@ class MoonRepository(private val moonDao: MoonDao) {
                 illumination = moon.Illumination
             )
         }
+
+        Log.d("MoonRepository", "Inserting moon phases for $yearMonthString: $moonPhases")
         moonDao.insertMoonPhases(moonPhases)
     }
+
 
     // Fetch Weekly Zodiac Advice
     suspend fun getWeeklyZodiacAdvice(sign: String): ZodiacResponse? {
@@ -66,6 +72,11 @@ class MoonRepository(private val moonDao: MoonDao) {
             null
         }
     }
+
+    suspend fun getAllMoonPhases(): List<MoonEntity> {
+        return moonDao.getAllMoonPhases().firstOrNull() ?: emptyList()
+    }
+
 
 
     // Fetch Zodiac Advice
