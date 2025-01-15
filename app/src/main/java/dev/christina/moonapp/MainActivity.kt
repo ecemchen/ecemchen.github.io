@@ -63,6 +63,11 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             LoginScreen(navController)
         }
 
+        composable("profileSettingsScreen") {
+            ProfileSettingsScreen(navController)
+        }
+
+
 
         composable("zodiacScreen") {
             ZodiacScreen(navController, moonViewModel)
