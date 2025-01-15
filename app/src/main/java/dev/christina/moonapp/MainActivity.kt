@@ -81,5 +81,12 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
         composable("moonList") {
             MoonListScreen(navController, moonViewModel)
         }
+
+        composable("userZodiacScreen/{zodiacSign}") { backStackEntry ->
+            val zodiacSign = backStackEntry.arguments?.getString("zodiacSign")
+            zodiacSign?.let {
+                UserZodiacScreen(navController, it)
+            }
+        }
     }
 }
