@@ -189,7 +189,7 @@ fun RegisterScreen(navController: NavController) {
                                                             "Registration Successful!",
                                                             Toast.LENGTH_SHORT
                                                         ).show()
-                                                        navController.navigate("secondScreen/$email")
+                                                        navController.navigate("userZodiacScreen/$zodiacSign")
                                                     }
                                             }
                                         } else {
