@@ -5,9 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -63,9 +65,18 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             val zodiac = backStackEntry.arguments?.getString("zodiac")
             FirstScreen(navController, moonViewModel, zodiac)
         }
+        composable(
+            "secondScreen",
+        ) {
+            SecondScreen(navController, moonViewModel, LocalDate.now().toString(), noteViewModel, null)
+        }
 
-        composable("secondScreen") {
-            SecondScreen(navController, moonViewModel, date = LocalDate.now().toString(), noteViewModel)
+        composable(
+            route = "secondScreen/{email}",
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email")
+            SecondScreen(navController, moonViewModel, date = LocalDate.now().toString(), noteViewModel, email)
         }
 
         composable("moonList") {

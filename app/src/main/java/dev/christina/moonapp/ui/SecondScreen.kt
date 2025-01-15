@@ -44,8 +44,18 @@ fun SecondScreen(
     navController: NavController,
     viewModel: MoonViewModel,
     date: String?,
-    noteViewModel: NoteViewModel
+    noteViewModel: NoteViewModel,
+    email: String?
 ) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Welcome, $email!",
+            style = MaterialTheme.typography.titleLarge
+        )
+    }
     val currentDate = date ?: LocalDate.now().toString()
     val allMoonPhases = viewModel.allMoonPhases.collectAsState(emptyMap()).value
     val moonEntity = allMoonPhases[currentDate]
