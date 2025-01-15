@@ -45,43 +45,28 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
     val noteViewModel: NoteViewModel = viewModel(factory = NoteViewModelFactoryProvider(noteRepository))
 
     NavHost(navController = navController, startDestination = "welcomeScreen") {
-
         composable("welcomeScreen") {
             WelcomeScreen(navController)
         }
-
         composable("registerScreen") {
             RegisterScreen(navController)
         }
-
-        composable("secondScreen/{userName}") { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("userName")
+        composable("secondScreen") {
             SecondScreen(navController, moonViewModel, date = null, noteViewModel)
         }
-
         composable("loginScreen") {
             LoginScreen(navController)
         }
-
-
         composable("zodiacScreen") {
             ZodiacScreen(navController, moonViewModel)
         }
-
         composable("firstScreen/{zodiac}") { backStackEntry ->
             val zodiac = backStackEntry.arguments?.getString("zodiac")
             FirstScreen(navController, moonViewModel, zodiac)
         }
-
-        composable("secondScreen/{date}") { backStackEntry ->
-            val date = backStackEntry.arguments?.getString("date")
-            SecondScreen(navController, moonViewModel, date, noteViewModel) // Pass noteViewModel
-        }
-
         composable("moonList") {
             MoonListScreen(navController, moonViewModel)
         }
-
         composable("userZodiacScreen/{zodiacSign}") { backStackEntry ->
             val zodiacSign = backStackEntry.arguments?.getString("zodiacSign")
             zodiacSign?.let {
