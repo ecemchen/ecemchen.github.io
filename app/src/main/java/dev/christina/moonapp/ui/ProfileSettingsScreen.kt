@@ -2,9 +2,10 @@ package dev.christina.moonapp.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -201,99 +202,125 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                     )
 
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        // Year Picker
-                        IconButton(onClick = { if (selectedYear > 1900) selectedYear-- }) {
-                            Text("<", fontSize = 20.sp)
+                    // Unified Picker Styling
+                    val buttonSize = 42.dp // Consistent button size for circle
+                    val textFontSize = 16.sp // Unified text size
+                    val buttonFontSize = 14.sp // Unified button text size
+                    val buttonBorderColor = Color.Black // Updated border color for buttons
+                    val borderStroke = BorderStroke(1.dp, buttonBorderColor) // Updated button border stroke
+
+// Styled Year Picker
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        // Decrease Year Button
+                        IconButton(
+                            onClick = { if (selectedYear > 1900) selectedYear-- },
+                            modifier = Modifier
+                                .size(buttonSize) // Make height and width equal
+                                .border(borderStroke, shape = CircleShape) // Use CircleShape for circular border
+                        ) {
+                            Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
+
+                        // Year Text
                         Text(
                             text = "$selectedYear",
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            fontSize = textFontSize,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
                         )
-                        IconButton(onClick = { selectedYear++ }) {
-                            Text(">", fontSize = 20.sp)
+
+                        // Increase Year Button
+                        IconButton(
+                            onClick = { selectedYear++ },
+                            modifier = Modifier
+                                .size(buttonSize) // Make height and width equal
+                                .border(borderStroke, shape = CircleShape) // Use CircleShape for circular border
+                        ) {
+                            Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        // Month Picker
-                        IconButton(onClick = { if (selectedMonth > 1) selectedMonth-- else selectedMonth = 12 }) {
-                            Text("<", fontSize = 20.sp)
+// Styled Month Picker
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        // Decrease Month Button
+                        IconButton(
+                            onClick = { if (selectedMonth > 1) selectedMonth-- else selectedMonth = 12 },
+                            modifier = Modifier
+                                .size(buttonSize) // Make height and width equal
+                                .border(borderStroke, shape = CircleShape) // Use CircleShape for circular border
+                        ) {
+                            Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
+
+                        // Month Text
                         Text(
-                            text = Month.of(selectedMonth).name,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            text = Month.of(selectedMonth).name.capitalize(),
+                            fontSize = textFontSize,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
                         )
-                        IconButton(onClick = { if (selectedMonth < 12) selectedMonth++ else selectedMonth = 1 }) {
-                            Text(">", fontSize = 20.sp)
+
+                        // Increase Month Button
+                        IconButton(
+                            onClick = { if (selectedMonth < 12) selectedMonth++ else selectedMonth = 1 },
+                            modifier = Modifier
+                                .size(buttonSize) // Make height and width equal
+                                .border(borderStroke, shape = CircleShape) // Use CircleShape for circular border
+                        ) {
+                            Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        // Day Picker
-                        IconButton(onClick = { if (selectedDay > 1) selectedDay-- else selectedDay = daysInMonth }) {
-                            Text("<", fontSize = 20.sp)
+// Styled Day Picker
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        // Decrease Day Button
+                        IconButton(
+                            onClick = { if (selectedDay > 1) selectedDay-- else selectedDay = daysInMonth },
+                            modifier = Modifier
+                                .size(buttonSize) // Make height and width equal
+                                .border(borderStroke, shape = CircleShape) // Use CircleShape for circular border
+                        ) {
+                            Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
+
+                        // Day Text
                         Text(
                             text = "$selectedDay",
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            fontSize = textFontSize,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
                         )
-                        IconButton(onClick = { if (selectedDay < daysInMonth) selectedDay++ else selectedDay = 1 }) {
-                            Text(">", fontSize = 20.sp)
+
+                        // Increase Day Button
+                        IconButton(
+                            onClick = { if (selectedDay < daysInMonth) selectedDay++ else selectedDay = 1 },
+                            modifier = Modifier
+                                .size(buttonSize) // Make height and width equal
+                                .border(borderStroke, shape = CircleShape) // Use CircleShape for circular border
+                        ) {
+                            Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
 
-                    Button(
-                        onClick = {
-                            isLoading = true
-                            val birthdate = "$selectedYear-$selectedMonth-$selectedDay"
-                            val newZodiacSign = calculateZodiacSign(selectedYear, selectedMonth, selectedDay)
-                            firestore.collection("users").document(user?.uid ?: "")
-                                .update(mapOf("birthdate" to birthdate, "zodiacSign" to newZodiacSign))
-                                .addOnCompleteListener {
-                                    if (it.isSuccessful) {
-                                        successMessage = "Birthdate successfully updated"
-                                        moonViewModel.setSelectedZodiac(newZodiacSign) // Update in ViewModel
-                                    } else {
-                                        successMessage = "Error updating birthdate"
-                                    }
-                                    isLoading = false
-                                }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
-                    ) {
-                        Text("Save Changes", color = Color.White)
-                    }
-                    OutlinedButton(
-                        onClick = {
-                            firebaseAuth.signOut()
-                            navController.navigate("welcomeScreen") {
-                                popUpTo("welcomeScreen") { inclusive = true }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(48.dp),
-                        border = BorderStroke(2.dp, Color.Black),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        )
-                    ) {
-                        Text(
-                            text = "Logout",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
                 }
-            }
         }
     }
-}
+}}
