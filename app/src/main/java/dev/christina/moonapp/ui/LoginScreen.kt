@@ -2,6 +2,7 @@ package dev.christina.moonapp.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -67,15 +68,36 @@ fun LoginScreen(navController: NavController, moonViewModel: MoonViewModel) {
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
-                        modifier = Modifier.fillMaxWidth(0.8f)
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(56.dp), // Consistent height
+                        shape = RoundedCornerShape(24.dp), // Rounded corners
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color(0x8094B9FF), // Blue transparent background
+                            focusedIndicatorColor = Color.Transparent, // Remove underline on focus
+                            unfocusedIndicatorColor = Color.Transparent, // Remove underline when unfocused
+                            cursorColor = Color.Black, // Set cursor color
+                            focusedLabelColor = Color.Black, // Label color when focused
+                            unfocusedLabelColor = Color.Gray // Label color when unfocused
+                        )
                     )
-
                     TextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        visualTransformation = PasswordVisualTransformation()
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(56.dp), // Consistent height
+                        shape = RoundedCornerShape(24.dp), // Rounded corners
+                        visualTransformation = PasswordVisualTransformation(), // Hide password input
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color(0x8094B9FF), // Blue transparent background
+                            focusedIndicatorColor = Color.Transparent, // Remove underline on focus
+                            unfocusedIndicatorColor = Color.Transparent, // Remove underline when unfocused
+                            cursorColor = Color.Black, // Cursor color
+                            focusedLabelColor = Color.Black, // Label color when focused
+                            unfocusedLabelColor = Color.Gray // Label color when unfocused
+                        )
                     )
 
                     Button(
