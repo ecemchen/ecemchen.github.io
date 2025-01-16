@@ -1,17 +1,20 @@
 package dev.christina.moonapp.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import dev.christina.moonapp.R
 
 @Composable
 fun WelcomeScreen(navController: NavController) {
@@ -30,6 +33,14 @@ fun WelcomeScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
+                //  Image
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "App Logo",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .padding(bottom = 46.dp)
+                )
                 // Title
                 Text(
                     text = "WELCOME TO MOONAPP",
