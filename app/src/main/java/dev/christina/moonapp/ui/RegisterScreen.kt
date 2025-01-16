@@ -101,7 +101,7 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                         label = { Text("Email") },
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
-                            .height(56.dp), // Consistent height
+                            .height(60.dp), // Consistent height
                         shape = RoundedCornerShape(24.dp), // Rounded corners
 
                     )
@@ -112,7 +112,7 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                         label = { Text("Password") },
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
-                            .height(56.dp),
+                            .height(60.dp),
                         shape = RoundedCornerShape(24.dp), // Rounded corners for the border
                         visualTransformation = PasswordVisualTransformation(), // Hide password input
 
