@@ -1,7 +1,9 @@
 package dev.christina.moonapp.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -95,20 +97,45 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
-                        modifier = Modifier.fillMaxWidth(0.8f)
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(56.dp), // Consistent height
+                        shape = RoundedCornerShape(24.dp), // Rounded corners
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color(0x8094B9FF), // Blue transparent background
+                            focusedIndicatorColor = Color.Transparent, // Remove underline on focus
+                            unfocusedIndicatorColor = Color.Transparent, // Remove underline when unfocused
+                            cursorColor = Color.Black, // Set cursor color
+                            focusedLabelColor = Color.Black, // Label color when focused
+                            unfocusedLabelColor = Color.Gray // Label color when unfocused
+                        )
                     )
 
                     TextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        visualTransformation = PasswordVisualTransformation()
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(56.dp), // Consistent height
+                        shape = RoundedCornerShape(24.dp), // Rounded corners
+                        visualTransformation = PasswordVisualTransformation(), // Hide password input
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color(0x8094B9FF), // Blue transparent background
+                            focusedIndicatorColor = Color.Transparent, // Remove underline on focus
+                            unfocusedIndicatorColor = Color.Transparent, // Remove underline when unfocused
+                            cursorColor = Color.Black, // Cursor color
+                            focusedLabelColor = Color.Black, // Label color when focused
+                            unfocusedLabelColor = Color.Gray // Label color when unfocused
+                        )
                     )
 
                     Text(
                         text = "Select your birthdate",
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color.Black,
+                            fontSize = 18.sp // Adjust the font size here
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp)
@@ -116,49 +143,93 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                     )
 
 
-                    // Date Selection
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        // Year Picker
-                        IconButton(onClick = { if (selectedYear > 1900) selectedYear-- }) {
-                            Text("<", fontSize = 20.sp)
+                    // Styled Year Picker
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { if (selectedYear > 1900) selectedYear-- },
+                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                        ) {
+                            Text("<", fontSize = 18.sp, color = Color.Gray)
                         }
                         Text(
                             text = "$selectedYear",
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .background(Color(0x8094B9FF), shape = RoundedCornerShape(12.dp))
+                                .padding(8.dp)
                         )
-                        IconButton(onClick = { selectedYear++ }) {
-                            Text(">", fontSize = 20.sp)
+                        IconButton(
+                            onClick = { selectedYear++ },
+                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                        ) {
+                            Text(">", fontSize = 18.sp, color = Color.Gray)
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        // Month Picker
-                        IconButton(onClick = { if (selectedMonth > 1) selectedMonth-- else selectedMonth = 12 }) {
-                            Text("<", fontSize = 20.sp)
+                    // Styled Month Picker
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { if (selectedMonth > 1) selectedMonth-- else selectedMonth = 12 },
+                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                        ) {
+                            Text("<", fontSize = 18.sp, color = Color.Gray)
                         }
                         Text(
-                            text = Month.of(selectedMonth).name,
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            text = Month.of(selectedMonth).name.capitalize(),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .background(Color(0x8094B9FF), shape = RoundedCornerShape(12.dp))
+                                .padding(8.dp)
                         )
-                        IconButton(onClick = { if (selectedMonth < 12) selectedMonth++ else selectedMonth = 1 }) {
-                            Text(">", fontSize = 20.sp)
+                        IconButton(
+                            onClick = { if (selectedMonth < 12) selectedMonth++ else selectedMonth = 1 },
+                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                        ) {
+                            Text(">", fontSize = 18.sp, color = Color.Gray)
                         }
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        // Day Picker
-                        IconButton(onClick = { if (selectedDay > 1) selectedDay-- else selectedDay = daysInMonth }) {
-                            Text("<", fontSize = 20.sp)
+                    // Styled Day Picker
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { if (selectedDay > 1) selectedDay-- else selectedDay = daysInMonth },
+                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                        ) {
+                            Text("<", fontSize = 18.sp, color = Color.Gray)
                         }
                         Text(
                             text = "$selectedDay",
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .background(Color(0x8094B9FF), shape = RoundedCornerShape(12.dp))
+                                .padding(8.dp)
                         )
-                        IconButton(onClick = { if (selectedDay < daysInMonth) selectedDay++ else selectedDay = 1 }) {
-                            Text(">", fontSize = 20.sp)
+                        IconButton(
+                            onClick = { if (selectedDay < daysInMonth) selectedDay++ else selectedDay = 1 },
+                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                        ) {
+                            Text(">", fontSize = 18.sp, color = Color.Gray)
                         }
                     }
 
