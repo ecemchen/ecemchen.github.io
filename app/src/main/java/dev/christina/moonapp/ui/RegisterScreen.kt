@@ -1,7 +1,9 @@
 package dev.christina.moonapp.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -101,11 +103,7 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             .fillMaxWidth(0.8f)
                             .height(56.dp), // Consistent height
                         shape = RoundedCornerShape(24.dp), // Rounded corners
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF94B9FF), // Blue border when focused
-                            unfocusedBorderColor = Color.Gray, // Gray border when unfocused
-                            unfocusedLabelColor = Color.Gray // Label color when unfocused
-                        )
+
                     )
 
                     OutlinedTextField(
@@ -117,11 +115,7 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             .height(56.dp),
                         shape = RoundedCornerShape(24.dp), // Rounded corners for the border
                         visualTransformation = PasswordVisualTransformation(), // Hide password input
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF94B9FF), // Blue border when focused
-                            unfocusedBorderColor = Color.Gray,
-                            unfocusedLabelColor = Color.Gray // Label color when unfocused
-                        )
+
                     )
 
                     Text(
@@ -137,95 +131,137 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                     )
 
 
-                    // Styled Year Picker
+                    // Unified Picker Styling
+                    val buttonSize = 42.dp // Consistent button size
+                    val textFontSize = 16.sp // Consistent text size
+                    val buttonFontSize = 14.sp // Consistent button text size
+                    val borderColor = Color(0xFF94B9FF) // Border color
+                    val borderStroke = BorderStroke(1.dp, borderColor) // Border stroke
+
+// Styled Year Picker
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.padding(vertical = 8.dp)
                     ) {
+                        // Decrease Year Button
                         IconButton(
                             onClick = { if (selectedYear > 1900) selectedYear-- },
-                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                            modifier = Modifier
+                                .size(buttonSize) // Unified size
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .padding(4.dp)
                         ) {
-                            Text("<", fontSize = 18.sp, color = Color.Gray)
+                            Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
+
+                        // Year Text with Stroke
                         Text(
                             text = "$selectedYear",
-                            fontSize = 16.sp,
+                            fontSize = textFontSize, // Unified font size
                             fontWeight = FontWeight.Normal,
                             color = Color.Black,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .background(Color(0x8094B9FF), shape = RoundedCornerShape(12.dp))
+                                .border(borderStroke, shape = RoundedCornerShape(12.dp)) // Unified border
                                 .padding(8.dp)
                         )
+
+                        // Increase Year Button
                         IconButton(
                             onClick = { selectedYear++ },
-                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                            modifier = Modifier
+                                .size(buttonSize) // Unified size
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .padding(4.dp)
                         ) {
-                            Text(">", fontSize = 18.sp, color = Color.Gray)
+                            Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
 
-                    // Styled Month Picker
+// Styled Month Picker
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.padding(vertical = 8.dp)
                     ) {
+                        // Decrease Month Button
                         IconButton(
                             onClick = { if (selectedMonth > 1) selectedMonth-- else selectedMonth = 12 },
-                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                            modifier = Modifier
+                                .size(buttonSize) // Unified size
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .padding(4.dp)
                         ) {
-                            Text("<", fontSize = 18.sp, color = Color.Gray)
+                            Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
+
+                        // Month Text with Stroke
                         Text(
                             text = Month.of(selectedMonth).name.capitalize(),
-                            fontSize = 16.sp,
+                            fontSize = textFontSize, // Unified font size
                             fontWeight = FontWeight.Normal,
                             color = Color.Black,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .background(Color(0x8094B9FF), shape = RoundedCornerShape(12.dp))
+                                .border(borderStroke, shape = RoundedCornerShape(12.dp)) // Unified border
                                 .padding(8.dp)
                         )
+
+                        // Increase Month Button
                         IconButton(
                             onClick = { if (selectedMonth < 12) selectedMonth++ else selectedMonth = 1 },
-                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                            modifier = Modifier
+                                .size(buttonSize) // Unified size
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .padding(4.dp)
                         ) {
-                            Text(">", fontSize = 18.sp, color = Color.Gray)
+                            Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
 
-                    // Styled Day Picker
+// Styled Day Picker
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.padding(vertical = 8.dp)
                     ) {
+                        // Decrease Day Button
                         IconButton(
                             onClick = { if (selectedDay > 1) selectedDay-- else selectedDay = daysInMonth },
-                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                            modifier = Modifier
+                                .size(buttonSize) // Unified size
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .padding(4.dp)
                         ) {
-                            Text("<", fontSize = 18.sp, color = Color.Gray)
+                            Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
+
+                        // Day Text with Stroke
                         Text(
                             text = "$selectedDay",
-                            fontSize = 16.sp,
+                            fontSize = textFontSize, // Unified font size
                             fontWeight = FontWeight.Normal,
                             color = Color.Black,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .background(Color(0x8094B9FF), shape = RoundedCornerShape(12.dp))
+                                .border(borderStroke, shape = RoundedCornerShape(12.dp)) // Unified border
                                 .padding(8.dp)
                         )
+
+                        // Increase Day Button
                         IconButton(
                             onClick = { if (selectedDay < daysInMonth) selectedDay++ else selectedDay = 1 },
-                            modifier = Modifier.background(Color(0x8094B9FF), shape = RoundedCornerShape(50))
+                            modifier = Modifier
+                                .size(buttonSize) // Unified size
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .padding(4.dp)
                         ) {
-                            Text(">", fontSize = 18.sp, color = Color.Gray)
+                            Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
+
+
 
                     // Register Button
                     Button(
