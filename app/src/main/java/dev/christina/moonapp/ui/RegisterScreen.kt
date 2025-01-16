@@ -135,8 +135,8 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                     val buttonSize = 42.dp // Consistent button size
                     val textFontSize = 16.sp // Consistent text size
                     val buttonFontSize = 14.sp // Consistent button text size
-                    val borderColor = Color(0xFF94B9FF) // Border color
-                    val borderStroke = BorderStroke(1.dp, borderColor) // Border stroke
+                    val buttonBorderColor = Color.Black // Updated border color for buttons
+                    val borderStroke = BorderStroke(1.dp, buttonBorderColor) // Updated button border stroke
 
 // Styled Year Picker
                     Row(
@@ -149,13 +149,13 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             onClick = { if (selectedYear > 1900) selectedYear-- },
                             modifier = Modifier
                                 .size(buttonSize) // Unified size
-                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Updated border
                                 .padding(4.dp)
                         ) {
                             Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
 
-                        // Year Text with Stroke
+                        // Year Text
                         Text(
                             text = "$selectedYear",
                             fontSize = textFontSize, // Unified font size
@@ -163,7 +163,6 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             color = Color.Black,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .border(borderStroke, shape = RoundedCornerShape(12.dp)) // Unified border
                                 .padding(8.dp)
                         )
 
@@ -172,7 +171,7 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             onClick = { selectedYear++ },
                             modifier = Modifier
                                 .size(buttonSize) // Unified size
-                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Updated border
                                 .padding(4.dp)
                         ) {
                             Text(">", fontSize = buttonFontSize, color = Color.Gray)
@@ -190,13 +189,13 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             onClick = { if (selectedMonth > 1) selectedMonth-- else selectedMonth = 12 },
                             modifier = Modifier
                                 .size(buttonSize) // Unified size
-                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Updated border
                                 .padding(4.dp)
                         ) {
                             Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
 
-                        // Month Text with Stroke
+                        // Month Text
                         Text(
                             text = Month.of(selectedMonth).name.capitalize(),
                             fontSize = textFontSize, // Unified font size
@@ -204,7 +203,6 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             color = Color.Black,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .border(borderStroke, shape = RoundedCornerShape(12.dp)) // Unified border
                                 .padding(8.dp)
                         )
 
@@ -213,7 +211,7 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             onClick = { if (selectedMonth < 12) selectedMonth++ else selectedMonth = 1 },
                             modifier = Modifier
                                 .size(buttonSize) // Unified size
-                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Updated border
                                 .padding(4.dp)
                         ) {
                             Text(">", fontSize = buttonFontSize, color = Color.Gray)
@@ -231,13 +229,13 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             onClick = { if (selectedDay > 1) selectedDay-- else selectedDay = daysInMonth },
                             modifier = Modifier
                                 .size(buttonSize) // Unified size
-                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Updated border
                                 .padding(4.dp)
                         ) {
                             Text("<", fontSize = buttonFontSize, color = Color.Gray)
                         }
 
-                        // Day Text with Stroke
+                        // Day Text
                         Text(
                             text = "$selectedDay",
                             fontSize = textFontSize, // Unified font size
@@ -245,7 +243,6 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             color = Color.Black,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .border(borderStroke, shape = RoundedCornerShape(12.dp)) // Unified border
                                 .padding(8.dp)
                         )
 
@@ -254,12 +251,13 @@ fun RegisterScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             onClick = { if (selectedDay < daysInMonth) selectedDay++ else selectedDay = 1 },
                             modifier = Modifier
                                 .size(buttonSize) // Unified size
-                                .border(borderStroke, shape = RoundedCornerShape(50)) // Unified border
+                                .border(borderStroke, shape = RoundedCornerShape(50)) // Updated border
                                 .padding(4.dp)
                         ) {
                             Text(">", fontSize = buttonFontSize, color = Color.Gray)
                         }
                     }
+
 
 
 
