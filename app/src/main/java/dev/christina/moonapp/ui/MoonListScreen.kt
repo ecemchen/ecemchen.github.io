@@ -76,11 +76,6 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
                         }
                     }
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
-                    }
-                }
             )
         },
         bottomBar = {

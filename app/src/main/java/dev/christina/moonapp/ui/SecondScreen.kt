@@ -156,11 +156,6 @@ fun SecondScreen(
                         )
                     }
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
-                    }
-                },
                 actions = {
                     Row {
                         IconButton(
