@@ -203,7 +203,7 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     )
 
                     // Unified Picker Styling
-                    val buttonSize = 42.dp // Consistent button size for circle
+                    val buttonSize = 38.dp // Consistent button size for circle
                     val textFontSize = 16.sp // Unified text size
                     val buttonFontSize = 14.sp // Unified button text size
                     val buttonBorderColor = Color.Black // Updated border color for buttons
@@ -213,7 +213,7 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 6.dp)
                     ) {
                         // Decrease Year Button
                         IconButton(
@@ -250,7 +250,7 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 6.dp)
                     ) {
                         // Decrease Month Button
                         IconButton(
@@ -287,7 +287,7 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 6.dp)
                     ) {
                         // Decrease Day Button
                         IconButton(
@@ -320,7 +320,54 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                         }
                     }
 
+                    Button(
+                        onClick = {
+                            isLoading = true
+                            val birthdate = "$selectedYear-$selectedMonth-$selectedDay"
+                            val newZodiacSign = calculateZodiacSign(selectedYear, selectedMonth, selectedDay)
+                            firestore.collection("users").document(user?.uid ?: "")
+                                .update(mapOf("birthdate" to birthdate, "zodiacSign" to newZodiacSign))
+                                .addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        successMessage = "Birthdate successfully updated"
+                                        moonViewModel.setSelectedZodiac(newZodiacSign) // Update in ViewModel
+                                    } else {
+                                        successMessage = "Error updating birthdate"
+                                    }
+                                    isLoading = false
+                                }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                    ) {
+                        Text("Save Changes", color = Color.White)
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            firebaseAuth.signOut()
+                            navController.navigate("welcomeScreen") {
+                                popUpTo("welcomeScreen") { inclusive = true }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(48.dp),
+                        border = BorderStroke(2.dp, Color.Black),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text(
+                            text = "Logout",
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
+            }
         }
     }
-}}
+}
