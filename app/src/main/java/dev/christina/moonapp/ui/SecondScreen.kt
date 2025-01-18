@@ -407,11 +407,11 @@ fun SecondScreen(
                         Text(
                             text = when {
                                 isLoadingAdvice -> "Loading..."
-                                LocalDate.parse(currentDate).isAfter(LocalDate.now()) -> "Horoscope is not available."
+                                LocalDate.parse(currentDate).isAfter(LocalDate.now()) -> "The universe likes to keep some secrets. Come back when it's time!"
                                 zodiacAdvice?.data != null -> "\"${zodiacAdvice.data.horoscope_data}\""
                                 weeklyZodiacAdvice?.data != null -> "\"${weeklyZodiacAdvice.data.horoscope_data}\""
                                 monthlyZodiacAdvice?.data != null -> "\"${monthlyZodiacAdvice.data.horoscope_data}\""
-                                else -> "Horoscope advice unavailable."
+                                else -> "The universe likes to keep some secrets. Come back when it's time!"
                             },
                             style = MaterialTheme.typography.bodyLarge.copy(
                                 fontWeight = FontWeight.Normal,
