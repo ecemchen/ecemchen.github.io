@@ -1,5 +1,6 @@
 package dev.christina.moonapp.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,20 +15,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import dev.christina.moonapp.data.db.MoonDatabase
+import dev.christina.moonapp.repository.FirebaseRepository
+import dev.christina.moonapp.repository.MoonRepository
+import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController, moonViewModel: MoonViewModel) {
+fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     val firebaseAuth = FirebaseAuth.getInstance()
-    val firestore = FirebaseFirestore.getInstance()
+    val firebaseRepository = FirebaseRepository(com.google.firebase.firestore.FirebaseFirestore.getInstance())
+
+    // Initialize MoonViewModel
+    val moonViewModel: MoonViewModel = viewModel(
+        factory = ViewModelFactoryProvider(
+            MoonRepository(
+                MoonDatabase.getDatabase(context).moonDao()
+            )
+        )
+    )
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+
 
     Scaffold(
         topBar = {
@@ -72,7 +90,6 @@ fun LoginScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             .fillMaxWidth(0.8f)
                             .height(60.dp), // Consistent height
                         shape = RoundedCornerShape(24.dp), // Rounded corners
-
                     )
                     OutlinedTextField(
                         value = password,
@@ -83,7 +100,6 @@ fun LoginScreen(navController: NavController, moonViewModel: MoonViewModel) {
                             .height(60.dp),
                         shape = RoundedCornerShape(24.dp), // Rounded corners for the border
                         visualTransformation = PasswordVisualTransformation(), // Hide password input
-
                     )
 
                     Button(
@@ -95,36 +111,32 @@ fun LoginScreen(navController: NavController, moonViewModel: MoonViewModel) {
                                         if (task.isSuccessful) {
                                             val user = task.result?.user
                                             user?.let {
-                                                // Fetch user's zodiac sign from Firestore
-                                                firestore.collection("users").document(it.uid).get()
-                                                    .addOnSuccessListener { document ->
-                                                        val zodiacSign =
-                                                            document.getString("zodiacSign")
-                                                        if (zodiacSign != null) {
-                                                            moonViewModel.setSelectedZodiac(
-                                                                zodiacSign
-                                                            ) // Set zodiac in ViewModel
-                                                            navController.navigate("secondScreen/${email}")
+                                                coroutineScope.launch {
+                                                    try {
+                                                        Log.d("LoginScreen", "Fetching zodiac sign for user: ${it.uid}")
+
+                                                        // Ensure zodiac sign is retrieved
+                                                        val zodiacSign = moonViewModel.getZodiacSign(it.uid, firebaseRepository)
+
+                                                        if (!zodiacSign.isNullOrBlank()) {
+                                                            Log.d("LoginScreen", "Selected Zodiac fetched: $zodiacSign")
+                                                            moonViewModel.setSelectedZodiac(zodiacSign)
+                                                            navController.navigate("secondScreen?email=$email&date=${LocalDate.now()}")
                                                         } else {
-                                                            Toast.makeText(
-                                                                context,
-                                                                "Failed to retrieve user data",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
+                                                            throw Exception("Zodiac sign not found.")
                                                         }
+                                                    } catch (e: Exception) {
+                                                        Log.e("LoginScreen", "Error during login flow: ${e.message}")
+                                                        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                                                    } finally {
+                                                        isLoading = false
                                                     }
-                                                    .addOnFailureListener {
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Error fetching user data",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-                                                    }
+                                                }
                                             }
                                         } else {
                                             Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+                                            isLoading = false
                                         }
-                                        isLoading = false
                                     }
                             } else {
                                 Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()

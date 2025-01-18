@@ -1,6 +1,8 @@
 package dev.christina.moonapp.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -19,86 +21,124 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import dev.christina.moonapp.data.db.MoonEntity
 import java.time.LocalDate
-import java.time.Month
 import java.time.YearMonth
+import java.time.format.TextStyle
 import java.util.*
+import java.time.Month
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
     val moonList by viewModel.moonList.collectAsState(emptyList())
-
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(today.monthValue) }
     var selectedYear by remember { mutableStateOf(today.year) }
 
-    // Get days in the selected month and start day of the week
-    val daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
-    val firstDayOfMonth = LocalDate.of(selectedYear, selectedMonth, 1).dayOfWeek.value % 7
+    // Ensure valid days for the selected month and year
+    fun safeLocalDate(year: Int, month: Int, day: Int): LocalDate {
+        val daysInMonth = YearMonth.of(year, month).lengthOfMonth()
+        val safeDay = if (day > daysInMonth) daysInMonth else day
+        return LocalDate.of(year, month, safeDay)
+    }
 
-    // Prepare options for year and month selectors
-    val pastYears = (2020..today.year).toList().reversed()
-    val pastMonths = Month.values()
-        .filter { yearMatches(selectedYear, today) && it.value <= today.monthValue || selectedYear < today.year }
-        .map { it.name.toLowerCase(Locale.ENGLISH).capitalize(Locale.ENGLISH) }
+    // Trigger data fetch for the selected month
+    LaunchedEffect(selectedMonth, selectedYear) {
+        viewModel.fetchMoonPhasesForMonth(YearMonth.of(selectedYear, selectedMonth))
+    }
+
+    // Get weekday headers and month name
+    val monthName = Month.of(selectedMonth).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+    val weekDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        IconButton(
+                            onClick = {
+                                if (selectedMonth > 1) {
+                                    selectedMonth--
+                                } else {
+                                    selectedMonth = 12
+                                    selectedYear--
+                                }
+                            },
+                            modifier = Modifier.border(BorderStroke(1.dp, Color.Black), CircleShape)
+                        ) {
+                            Text("<", color = Color.Black)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "Select Date",
-                            fontSize = 20.sp,
+                            text = "$monthName $selectedYear",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
+                        Spacer(modifier = Modifier.width(16.dp))
+                        IconButton(
+                            onClick = {
+                                if (selectedMonth < 12) {
+                                    selectedMonth++
+                                } else {
+                                    selectedMonth = 1
+                                    selectedYear++
+                                }
+                            },
+                            modifier = Modifier.border(BorderStroke(1.dp, Color.Black), CircleShape)
                         ) {
-                            StyledDropdownMenuField(
-                                label = "Year",
-                                selectedValue = selectedYear.toString(),
-                                options = pastYears.map { it.toString() },
-                                onValueSelected = { selectedYear = it.toInt() }
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            StyledDropdownMenuField(
-                                label = "Month",
-                                selectedValue = Month.of(selectedMonth).name.toLowerCase(Locale.ENGLISH)
-                                    .capitalize(Locale.ENGLISH),
-                                options = pastMonths,
-                                onValueSelected = { selectedMonth = Month.valueOf(it.toUpperCase(Locale.ENGLISH)).value }
-                            )
+                            Text(">", color = Color.Black)
                         }
                     }
-                },
+                }
             )
         },
         bottomBar = {
             BottomNavigationBar(navController = navController, currentScreen = "moonList")
         }
     ) { padding ->
+        val daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
+        val firstDayOfMonth = LocalDate.of(selectedYear, selectedMonth, 1).dayOfWeek.value
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            // Weekday headers
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                weekDays.forEach { day ->
+                    Text(
+                        text = day,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
                 modifier = Modifier.fillMaxWidth(),
                 content = {
                     // Empty cells before the first day of the month
-                    for (i in 0 until firstDayOfMonth) {
+                    for (i in 1 until firstDayOfMonth) {
                         item { Spacer(modifier = Modifier.size(40.dp)) }
                     }
 
                     // Render days of the selected month
                     for (day in 1..daysInMonth) {
-                        val currentDate = LocalDate.of(selectedYear, selectedMonth, day)
+                        val currentDate = safeLocalDate(selectedYear, selectedMonth, day)
                         val isSaved = moonList.any { it.date == currentDate.toString() }
 
                         item {
@@ -106,7 +146,7 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
                                 modifier = Modifier
                                     .size(50.dp)
                                     .clickable {
-                                        navController.navigate("secondScreen/${currentDate}")
+                                        navController.navigate("secondScreen?date=$currentDate")
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -132,56 +172,4 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
             )
         }
     }
-}
-
-@Composable
-fun StyledDropdownMenuField(
-    label: String,
-    selectedValue: String,
-    options: List<String>,
-    onValueSelected: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Box(
-            modifier = Modifier
-                .background(Color.LightGray, CircleShape)
-                .clickable { expanded = true }
-                .padding(12.dp)
-        ) {
-            Text(
-                text = selectedValue,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.wrapContentWidth()
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option, fontSize = 16.sp, color = Color.Black) },
-                    onClick = {
-                        onValueSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-private fun yearMatches(selectedYear: Int, today: LocalDate): Boolean {
-    return selectedYear == today.year
 }

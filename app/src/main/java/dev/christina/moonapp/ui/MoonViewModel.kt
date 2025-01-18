@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.christina.moonapp.data.db.MoonEntity
 import dev.christina.moonapp.data.remote.ZodiacResponse
+import dev.christina.moonapp.repository.FirebaseRepository
 import dev.christina.moonapp.repository.MoonRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,12 +22,6 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
     private val _moonList = MutableStateFlow<List<MoonEntity>>(emptyList())
     val moonList: StateFlow<List<MoonEntity>> = _moonList
 
-    private val _selectedZodiac = MutableStateFlow<String?>(null)
-    val selectedZodiac: StateFlow<String?> = _selectedZodiac
-
-    private val _zodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
-    val zodiacAdvice: StateFlow<ZodiacResponse?> = _zodiacAdvice
-
     private val _isLoadingAdvice = MutableStateFlow(false)
     val isLoadingAdvice: StateFlow<Boolean> = _isLoadingAdvice
 
@@ -35,6 +30,41 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
 
     private val _monthlyZodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
     val monthlyZodiacAdvice: StateFlow<ZodiacResponse?> = _monthlyZodiacAdvice
+
+    private val _selectedZodiac = MutableStateFlow<String?>(null)
+    val selectedZodiac: StateFlow<String?> = _selectedZodiac
+
+    private val _zodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
+    val zodiacAdvice: StateFlow<ZodiacResponse?> = _zodiacAdvice
+
+    fun fetchZodiacAdvice(sign: String, date: String) {
+        viewModelScope.launch {
+            try {
+                _zodiacAdvice.value = repository.getZodiacAdvice(sign, date)
+                Log.d("MoonViewModel", "Fetched Zodiac Advice: ${_zodiacAdvice.value}")
+            } catch (e: Exception) {
+                Log.e("MoonViewModel", "Error fetching Zodiac Advice: ${e.message}")
+                _zodiacAdvice.value = null
+            }
+        }
+    }
+
+    suspend fun getZodiacSign(uid: String, firebaseRepository: FirebaseRepository): String? {
+        return try {
+            val userData = firebaseRepository.getUserData(uid)
+            val zodiacSign = userData?.get("zodiacSign") as? String
+            if (!zodiacSign.isNullOrBlank()) {
+                _selectedZodiac.value = zodiacSign
+                Log.d("MoonViewModel", "Zodiac Sign set to: $zodiacSign")
+            } else {
+                Log.w("MoonViewModel", "Zodiac sign is null or blank")
+            }
+            zodiacSign
+        } catch (e: Exception) {
+            Log.e("MoonViewModel", "Error fetching zodiac sign: ${e.message}")
+            null
+        }
+    }
 
 
     fun fetchMoonPhasesForMonth(yearMonth: YearMonth) {
@@ -73,18 +103,6 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
         _selectedZodiac.value = sign
     }
 
-    fun fetchZodiacAdvice(sign: String, date: String) {
-        viewModelScope.launch {
-            _isLoadingAdvice.value = true
-            Log.d("ZodiacAdvice", "Fetching advice for sign: $sign, date: $date")
-            val advice = repository.getZodiacAdvice(sign = sign, day = date)
-            Log.d("ZodiacAdvice", "Fetched advice: $advice")
-            _zodiacAdvice.value = advice
-            _weeklyZodiacAdvice.value = null
-            _monthlyZodiacAdvice.value = null
-            _isLoadingAdvice.value = false
-        }
-    }
 
     fun addToMoonList(moonEntity: MoonEntity) {
         if (!isInMoonList(moonEntity)) {

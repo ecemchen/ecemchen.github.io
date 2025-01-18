@@ -10,9 +10,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.analytics
 import dev.christina.moonapp.data.db.MoonDatabase
 import dev.christina.moonapp.repository.MoonRepository
 import dev.christina.moonapp.repository.NoteRepository
@@ -22,12 +19,8 @@ import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var firebaseAnalytics: FirebaseAnalytics
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        firebaseAnalytics = Firebase.analytics
 
         val database = MoonDatabase.getDatabase(this)
         val moonRepository = MoonRepository(database.moonDao())
@@ -35,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MoonAppTheme {
-                MyApp(moonRepository, noteRepository) // Pass both repositories to MyApp
+                MyApp(moonRepository, noteRepository)
             }
         }
     }
@@ -52,47 +45,46 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             WelcomeScreen(navController)
         }
         composable("registerScreen") {
-            RegisterScreen(navController, moonViewModel)
+            RegisterScreen(navController) // Use the correct function signature
         }
-
         composable("loginScreen") {
-            LoginScreen(navController, moonViewModel)
+            LoginScreen(navController)
         }
-        composable("zodiacScreen") {
-            ZodiacScreen(navController, moonViewModel)
+        composable("secondScreen?email={email}&date={date}",
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("date") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = LocalDate.now().toString()
+                }
+            )
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email")
+            val date = backStackEntry.arguments?.getString("date") ?: LocalDate.now().toString()
+            SecondScreen(navController, moonViewModel, date, noteViewModel, email)
         }
-        composable("firstScreen/{zodiac}") { backStackEntry ->
-            val zodiac = backStackEntry.arguments?.getString("zodiac")
-            FirstScreen(navController, moonViewModel, zodiac)
+        composable("moonList") {
+            MoonListScreen(navController, moonViewModel)
         }
-        composable(
-            "secondScreen",
-        ) {
-            SecondScreen(navController, moonViewModel, LocalDate.now().toString(), noteViewModel, null)
-        }
-
         composable("profileSettingsScreen") {
             ProfileSettingsScreen(navController, moonViewModel)
         }
 
-
         composable(
-            route = "secondScreen/{email}",
-            arguments = listOf(navArgument("email") { type = NavType.StringType })
+            "userZodiacScreen/{zodiacSign}",
+            arguments = listOf(
+                navArgument("zodiacSign") {
+                    type = NavType.StringType
+                }
+            )
         ) { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email")
-            SecondScreen(navController, moonViewModel, date = LocalDate.now().toString(), noteViewModel, email)
-        }
-
-        composable("moonList") {
-            MoonListScreen(navController, moonViewModel)
-        }
-        composable("userZodiacScreen/{zodiacSign}") { backStackEntry ->
-            val zodiacSign = backStackEntry.arguments?.getString("zodiacSign")
-            zodiacSign?.let {
-                moonViewModel.setSelectedZodiac(it) // Save zodiac in ViewModel
-                UserZodiacScreen(navController, it)
-            }
+            val zodiacSign = backStackEntry.arguments?.getString("zodiacSign") ?: "Unknown"
+            UserZodiacScreen(navController, zodiacSign)
         }
     }
 }

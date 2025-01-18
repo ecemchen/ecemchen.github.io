@@ -29,13 +29,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dev.christina.moonapp.R
 import dev.christina.moonapp.data.db.NoteEntity
+import dev.christina.moonapp.repository.FirebaseRepository
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,12 +58,25 @@ fun SecondScreen(
             style = MaterialTheme.typography.titleLarge
         )
     }
+
+    // Initialize or fetch current user ID
+    val firebaseRepository = FirebaseRepository(FirebaseFirestore.getInstance())
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    LaunchedEffect(Unit) {
+        currentUser?.let { user ->
+            val uid = user.uid
+            if (viewModel.selectedZodiac.value.isNullOrBlank()) {
+                // Fetch the zodiac sign only if it's not already set
+                viewModel.getZodiacSign(uid, firebaseRepository)
+            }
+        }
+    }
     val currentDate = date ?: LocalDate.now().toString()
     val allMoonPhases = viewModel.allMoonPhases.collectAsState(emptyMap()).value
     val moonEntity = allMoonPhases[currentDate]
 
     val selectedZodiac = viewModel.selectedZodiac.collectAsState().value
-    Log.d("SecondScreen", "Selected Zodiac: $selectedZodiac")
     val zodiacAdvice = viewModel.zodiacAdvice.collectAsState().value
     val weeklyZodiacAdvice = viewModel.weeklyZodiacAdvice.collectAsState().value
     val monthlyZodiacAdvice = viewModel.monthlyZodiacAdvice.collectAsState().value
@@ -81,10 +96,13 @@ fun SecondScreen(
 
     // Fetch zodiac advice when selectedZodiac or date changes
     LaunchedEffect(selectedZodiac, currentDate) {
-          if (!selectedZodiac.isNullOrBlank()) {
+        if (!selectedZodiac.isNullOrBlank()) {
             viewModel.fetchZodiacAdvice(selectedZodiac, currentDate)
+        } else {
+            Log.e("SecondScreen", "Selected Zodiac is null or blank, cannot fetch advice.")
         }
     }
+
 
     // Track notes
     LaunchedEffect(currentDate) {
@@ -176,9 +194,6 @@ fun SecondScreen(
                             )
                         }
 
-                        IconButton(onClick = { navController.navigate("moonList") }) {
-                            Icon(Icons.Default.List, contentDescription = "Moon List", tint = Color.Black)
-                        }
                     }
                 }
             )
@@ -542,4 +557,3 @@ fun BottomNavigationBar(navController: NavController, currentScreen: String) {
 }
 
 data class BottomNavItem(val label: String, val icon: Int, val route: String)
-
