@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import dev.christina.moonapp.data.db.MoonEntity
 import java.time.LocalDate
 import java.time.YearMonth
@@ -146,7 +147,8 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
                                 modifier = Modifier
                                     .size(50.dp)
                                     .clickable {
-                                        navController.navigate("secondScreen?date=$currentDate")
+                                        val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
+                                        navController.navigate("secondScreen?email=${currentUserEmail ?: ""}&date=$currentDate")
                                     },
                                 contentAlignment = Alignment.Center
                             ) {

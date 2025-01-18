@@ -10,6 +10,7 @@ import dev.christina.moonapp.repository.MoonRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.YearMonth
 
 class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
@@ -37,16 +38,8 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
     private val _zodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
     val zodiacAdvice: StateFlow<ZodiacResponse?> = _zodiacAdvice
 
-    fun fetchZodiacAdvice(sign: String, date: String) {
-        viewModelScope.launch {
-            try {
-                _zodiacAdvice.value = repository.getZodiacAdvice(sign, date)
-                Log.d("MoonViewModel", "Fetched Zodiac Advice: ${_zodiacAdvice.value}")
-            } catch (e: Exception) {
-                Log.e("MoonViewModel", "Error fetching Zodiac Advice: ${e.message}")
-                _zodiacAdvice.value = null
-            }
-        }
+    fun setSelectedZodiac(sign: String) {
+        _selectedZodiac.value = sign
     }
 
     suspend fun getZodiacSign(uid: String, firebaseRepository: FirebaseRepository): String? {
@@ -55,7 +48,7 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
             val zodiacSign = userData?.get("zodiacSign") as? String
             if (!zodiacSign.isNullOrBlank()) {
                 _selectedZodiac.value = zodiacSign
-                Log.d("MoonViewModel", "Zodiac Sign set to: $zodiacSign")
+                Log.d("MoonViewModel", "Fetched Zodiac Sign: $zodiacSign")
             } else {
                 Log.w("MoonViewModel", "Zodiac sign is null or blank")
             }
@@ -66,47 +59,24 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
         }
     }
 
-
-    fun fetchMoonPhasesForMonth(yearMonth: YearMonth) {
+    fun fetchZodiacAdvice(sign: String, date: String) {
+        val parsedDate = runCatching { LocalDate.parse(date) }.getOrNull()
+        if (parsedDate == null) {
+            Log.e("MoonViewModel", "Invalid date format: $date")
+            return
+        }
         viewModelScope.launch {
-            repository.fetchAndSaveMoonPhasesForMonth(yearMonth)
-            val monthPhases = repository.getMoonPhasesForMonth(
-                month = yearMonth.monthValue,
-                year = yearMonth.year
-            )
-            _savedMoonPhases.value = monthPhases
-            _allMoonPhases.value = _allMoonPhases.value + monthPhases.associateBy { it.date }
-            Log.d("MoonViewModel", "Updated allMoonPhases: ${_allMoonPhases.value}")
-        }
-    }
-
-
-
-    fun toggleMoonList(moonEntity: MoonEntity) {
-        val updatedList = if (isInMoonList(moonEntity)) {
-            _moonList.value - moonEntity
-        } else {
-            _moonList.value + moonEntity
-        }
-        _moonList.value = updatedList
-    }
-
-    fun removeFromMoonList(moonEntity: MoonEntity) {
-        _moonList.value = _moonList.value - moonEntity
-    }
-
-    fun isInMoonList(moonEntity: MoonEntity): Boolean {
-        return _moonList.value.contains(moonEntity)
-    }
-
-    fun setSelectedZodiac(sign: String) {
-        _selectedZodiac.value = sign
-    }
-
-
-    fun addToMoonList(moonEntity: MoonEntity) {
-        if (!isInMoonList(moonEntity)) {
-            _moonList.value = _moonList.value + moonEntity
+            _isLoadingAdvice.value = true
+            try {
+                val advice = repository.getZodiacAdvice(sign, date)
+                _zodiacAdvice.value = advice
+                Log.d("MoonViewModel", "Fetched Zodiac Advice: $advice")
+            } catch (e: Exception) {
+                Log.e("MoonViewModel", "Error fetching Zodiac Advice: ${e.message}")
+                _zodiacAdvice.value = null
+            } finally {
+                _isLoadingAdvice.value = false
+            }
         }
     }
 
@@ -114,12 +84,11 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
         viewModelScope.launch {
             _isLoadingAdvice.value = true
             try {
-                Log.d("WeeklyZodiacAdvice", "Fetching weekly horoscope for sign: $sign")
-                val advice = repository.getWeeklyZodiacAdvice(sign = sign)
-                Log.d("WeeklyZodiacAdvice", "Fetched advice: $advice")
+                val advice = repository.getWeeklyZodiacAdvice(sign)
                 _weeklyZodiacAdvice.value = advice
                 _monthlyZodiacAdvice.value = null
                 _zodiacAdvice.value = null
+                Log.d("WeeklyZodiacAdvice", "Fetched Weekly Advice: $advice for week: $week")
             } catch (e: Exception) {
                 Log.e("WeeklyZodiacAdvice", "Error fetching weekly advice: ${e.message}")
             } finally {
@@ -128,23 +97,57 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
         }
     }
 
-
     fun fetchMonthlyZodiacAdvice(sign: String) {
         viewModelScope.launch {
             _isLoadingAdvice.value = true
             try {
-                Log.d("MonthlyZodiacAdvice", "Fetching monthly horoscope for sign: $sign")
-                val advice = repository.getMonthlyZodiacAdvice(sign = sign)
-                Log.d("MonthlyZodiacAdvice", "Fetched advice: $advice")
+                val advice = repository.getMonthlyZodiacAdvice(sign)
                 _monthlyZodiacAdvice.value = advice
                 _weeklyZodiacAdvice.value = null
                 _zodiacAdvice.value = null
+                Log.d("MonthlyZodiacAdvice", "Fetched Monthly Advice: $advice")
             } catch (e: Exception) {
                 Log.e("MonthlyZodiacAdvice", "Error fetching monthly advice: ${e.message}")
             } finally {
                 _isLoadingAdvice.value = false
             }
         }
+    }
+
+    fun fetchMoonPhasesForMonth(yearMonth: YearMonth) {
+        viewModelScope.launch {
+            try {
+                repository.fetchAndSaveMoonPhasesForMonth(yearMonth)
+                val monthPhases = repository.getMoonPhasesForMonth(
+                    month = yearMonth.monthValue,
+                    year = yearMonth.year
+                )
+                _savedMoonPhases.value = monthPhases
+                _allMoonPhases.value = _allMoonPhases.value + monthPhases.associateBy { it.date }
+                Log.d("MoonViewModel", "Updated allMoonPhases: ${_allMoonPhases.value}")
+            } catch (e: Exception) {
+                Log.e("MoonViewModel", "Error fetching moon phases: ${e.message}")
+            }
+        }
+    }
+
+    fun toggleMoonList(moonEntity: MoonEntity) {
+        val updatedList = if (_moonList.value.contains(moonEntity)) {
+            _moonList.value - moonEntity
+        } else {
+            _moonList.value + moonEntity
+        }
+        _moonList.value = updatedList
+    }
+
+    fun addToMoonList(moonEntity: MoonEntity) {
+        if (!_moonList.value.contains(moonEntity)) {
+            _moonList.value = _moonList.value + moonEntity
+        }
+    }
+
+    fun removeFromMoonList(moonEntity: MoonEntity) {
+        _moonList.value = _moonList.value - moonEntity
     }
 
     fun logAllMoonPhases() {
