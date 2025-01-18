@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import dev.christina.moonapp.data.db.MoonDatabase
 import dev.christina.moonapp.repository.FirebaseRepository
 import dev.christina.moonapp.repository.MoonRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -113,14 +114,21 @@ fun LoginScreen(navController: NavController) {
                                             user?.let {
                                                 coroutineScope.launch {
                                                     try {
-                                                        Log.d("LoginScreen", "Fetching zodiac sign for user: ${it.uid}")
-
+                                                        Log.d("LoginScreen", "Fetching data for user: ${it.uid}")
+                                                        moonViewModel.clearState()
                                                         // Ensure zodiac sign is retrieved
                                                         val zodiacSign = moonViewModel.getZodiacSign(it.uid, firebaseRepository)
 
                                                         if (!zodiacSign.isNullOrBlank()) {
-                                                            Log.d("LoginScreen", "Selected Zodiac fetched: $zodiacSign")
+                                                            Log.d("LoginScreen", "Fetched Zodiac Sign: $zodiacSign")
                                                             moonViewModel.setSelectedZodiac(zodiacSign)
+
+                                                            // Fetch saved days before navigating
+                                                            moonViewModel.fetchSavedDays(it.uid, firebaseRepository)
+                                                            delay(100)
+                                                            Log.d("LoginScreen", "Fetched savedDaysList before navigation.")
+
+                                                            // Navigate to SecondScreen
                                                             navController.navigate("secondScreen?email=$email&date=${LocalDate.now()}")
                                                         } else {
                                                             throw Exception("Zodiac sign not found.")

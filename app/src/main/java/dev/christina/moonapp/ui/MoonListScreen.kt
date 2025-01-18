@@ -1,6 +1,7 @@
 package dev.christina.moonapp.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,17 +22,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dev.christina.moonapp.data.db.MoonEntity
+import dev.christina.moonapp.repository.FirebaseRepository
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
 import java.time.Month
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.res.painterResource
+import dev.christina.moonapp.R
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
     val moonList by viewModel.moonList.collectAsState(emptyList())
+    val savedDays by viewModel.savedDaysList.collectAsState() // Collect saved days outside the loop
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(today.monthValue) }
     var selectedYear by remember { mutableStateOf(today.year) }
@@ -50,6 +59,13 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
     // Get weekday headers and month name
     val monthName = Month.of(selectedMonth).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
     val weekDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+    LaunchedEffect(Unit) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.uid?.let { uid ->
+            viewModel.fetchSavedDays(uid, FirebaseRepository(FirebaseFirestore.getInstance()))
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -130,48 +146,53 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
-                modifier = Modifier.fillMaxWidth(),
-                content = {
-                    // Empty cells before the first day of the month
-                    for (i in 1 until firstDayOfMonth) {
-                        item { Spacer(modifier = Modifier.size(40.dp)) }
-                    }
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Empty cells before the first day of the month
+                for (i in 1 until firstDayOfMonth) {
+                    item { Spacer(modifier = Modifier.size(40.dp)) }
+                }
 
-                    // Render days of the selected month
-                    for (day in 1..daysInMonth) {
-                        val currentDate = safeLocalDate(selectedYear, selectedMonth, day)
-                        val isSaved = moonList.any { it.date == currentDate.toString() }
+                // Render days of the selected month
+                for (day in 1..daysInMonth) {
+                    val currentDate = safeLocalDate(selectedYear, selectedMonth, day)
+                    val isSaved = savedDays.contains(currentDate.toString())
 
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clickable {
-                                        val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
-                                        navController.navigate("secondScreen?email=${currentUserEmail ?: ""}&date=$currentDate")
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(
-                                        text = day.toString(),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        color = Color.Black
+
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clickable {
+                                    val currentUserEmail =
+                                        FirebaseAuth.getInstance().currentUser?.email
+                                    navController.navigate("secondScreen?email=${currentUserEmail ?: ""}&date=$currentDate")
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = day.toString(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.Black
+                                )
+                                if (isSaved) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Icon(
+                                        imageVector = Icons.Filled.Favorite,
+                                        contentDescription = "Saved Day",
+                                        modifier = Modifier
+                                            .size(16.dp)
+                                            .background(Color.Transparent),
+                                        tint = Color.Red // Material 3 now supports tint directly!
                                     )
-                                    if (isSaved) {
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Box(
-                                            modifier = Modifier
-                                                .size(6.dp)
-                                                .background(Color.Red, CircleShape)
-                                        )
-                                    }
                                 }
+
                             }
                         }
                     }
                 }
-            )
+            }
         }
     }
 }

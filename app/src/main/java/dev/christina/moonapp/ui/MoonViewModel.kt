@@ -38,6 +38,9 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
     private val _zodiacAdvice = MutableStateFlow<ZodiacResponse?>(null)
     val zodiacAdvice: StateFlow<ZodiacResponse?> = _zodiacAdvice
 
+    private val _savedDaysList = MutableStateFlow<List<String>>(emptyList())
+    val savedDaysList: StateFlow<List<String>> = _savedDaysList
+
     fun setSelectedZodiac(sign: String) {
         _selectedZodiac.value = sign
     }
@@ -156,4 +159,64 @@ class MoonViewModel(private val repository: MoonRepository) : ViewModel() {
             Log.d("MoonViewModel", "All Moon Phases in DB: $allPhases")
         }
     }
+
+    fun saveDayAsFavorite(uid: String, date: String, firebaseRepository: FirebaseRepository) {
+        viewModelScope.launch {
+            try {
+                firebaseRepository.saveDayAsFavorite(uid, date)
+
+                // Update state immediately for immediate UI update
+                val updatedList = _savedDaysList.value.toMutableList()
+                if (!updatedList.contains(date)) {
+                    updatedList.add(date)
+                }
+                _savedDaysList.value = updatedList
+            } catch (e: Exception) {
+                Log.e("MoonViewModel", "Error saving favorite day: ${e.message}")
+            }
+        }
+    }
+
+    fun removeDayAsFavorite(uid: String, date: String, firebaseRepository: FirebaseRepository) {
+        viewModelScope.launch {
+            try {
+                firebaseRepository.removeDayAsFavorite(uid, date)
+
+                // Update state immediately for immediate UI update
+                val updatedList = _savedDaysList.value.toMutableList()
+                if (updatedList.contains(date)) {
+                    updatedList.remove(date)
+                }
+                _savedDaysList.value = updatedList
+            } catch (e: Exception) {
+                Log.e("MoonViewModel", "Error removing favorite day: ${e.message}")
+            }
+        }
+    }
+
+
+    fun fetchSavedDays(uid: String, firebaseRepository: FirebaseRepository) {
+        viewModelScope.launch {
+            try {
+                val savedDays = firebaseRepository.getSavedDays(uid)
+                _savedDaysList.value = savedDays // Triggers recomposition
+                Log.d("MoonViewModel", "Updated savedDaysList: $savedDays")
+            } catch (e: Exception) {
+                Log.e("MoonViewModel", "Error fetching saved days: ${e.message}")
+            }
+        }
+    }
+
+
+    fun clearState() {
+        _savedDaysList.value = emptyList()
+        _selectedZodiac.value = null
+        _zodiacAdvice.value = null
+        _weeklyZodiacAdvice.value = null
+        _monthlyZodiacAdvice.value = null
+        _allMoonPhases.value = emptyMap()
+        _savedMoonPhases.value = emptyList()
+        _moonList.value = emptyList()
+    }
+
 }

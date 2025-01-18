@@ -64,9 +64,14 @@ fun SecondScreen(
     val currentUser = FirebaseAuth.getInstance().currentUser
 
     // Remember the current date state to react to navigation changes
-    val currentDate = date ?: LocalDate.now().toString()
-    val isCurrentDay = LocalDate.parse(currentDate).isEqual(LocalDate.now())
+    val currentDate: String = date ?: LocalDate.now().toString()
 
+
+    // Observe savedDaysList and determine if the current date is favorited
+    val savedDaysList by viewModel.savedDaysList.collectAsState()
+    val isFavorite = remember(savedDaysList, currentDate) {
+        savedDaysList.contains(currentDate)
+    }
 
     LaunchedEffect(Unit) {
         currentUser?.let { user ->
@@ -76,6 +81,10 @@ fun SecondScreen(
             }
         }
     }
+
+    val isCurrentDay = LocalDate.parse(currentDate).isEqual(LocalDate.now())
+
+
     // Collect states from ViewModel
     val allMoonPhases = viewModel.allMoonPhases.collectAsState(emptyMap()).value
     val moonEntity = allMoonPhases[currentDate]
@@ -90,7 +99,7 @@ fun SecondScreen(
     val notes = noteViewModel.notesForDate.collectAsState().value
     val noteInput = remember { mutableStateOf("") }
     val editingNote = remember { mutableStateOf<NoteEntity?>(null) }
-    val isFavorite = viewModel.moonList.collectAsState().value.contains(moonEntity)
+
 
     // Option states for Daily, Weekly, Monthly advice
     val selectedOption = remember { mutableStateOf("Daily") }
@@ -191,11 +200,12 @@ fun SecondScreen(
                     Row {
                         IconButton(
                             onClick = {
-                                moonEntity?.let {
+                                currentUser?.let { user ->
+                                    val uid = user.uid
                                     if (isFavorite) {
-                                        viewModel.removeFromMoonList(it)
+                                        viewModel.removeDayAsFavorite(uid, currentDate, firebaseRepository)
                                     } else {
-                                        viewModel.addToMoonList(it)
+                                        viewModel.saveDayAsFavorite(uid, currentDate, firebaseRepository)
                                     }
                                 }
                             }
@@ -206,7 +216,6 @@ fun SecondScreen(
                                 tint = Color.Black
                             )
                         }
-
                     }
                 }
             )
@@ -534,8 +543,8 @@ fun SecondScreen(
 fun getMoonPhaseImageResource(phase: String): Int {
     return when (phase) {
         "Full Moon" -> R.drawable.moon_phases_fullmoon
-        "First Quarter" -> R.drawable.moon_phases_firstquarter
-        "Third Quarter" -> R.drawable.moon_phases_thirdquarter
+        "First Quarter", "1st Quarter" -> R.drawable.moon_phases_firstquarter
+        "Third Quarter", "3rd Quarter" -> R.drawable.moon_phases_thirdquarter
         "New Moon" -> R.drawable.moon_phases_newmoon
         "Dark Moon" -> R.drawable.moon_phases_newmoon
         "Waning Gibbous" -> R.drawable.moon_phases_waninggibbous
