@@ -37,9 +37,9 @@ import dev.christina.moonapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
-    val moonList by viewModel.moonList.collectAsState(emptyList())
-    val savedDays by viewModel.savedDaysList.collectAsState() // Collect saved days outside the loop
+fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, noteViewModel: NoteViewModel) {
+    val savedDays by moonViewModel.savedDaysList.collectAsState() // Collect saved days
+    val notesDays by noteViewModel.notesDates.collectAsState() // Collect note days
     val today = LocalDate.now()
     var selectedMonth by remember { mutableStateOf(today.monthValue) }
     var selectedYear by remember { mutableStateOf(today.year) }
@@ -53,19 +53,24 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
 
     // Trigger data fetch for the selected month
     LaunchedEffect(selectedMonth, selectedYear) {
-        viewModel.fetchMoonPhasesForMonth(YearMonth.of(selectedYear, selectedMonth))
+        moonViewModel.fetchMoonPhasesForMonth(YearMonth.of(selectedYear, selectedMonth))
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            noteViewModel.fetchNotesForMonth(uid, YearMonth.of(selectedYear, selectedMonth))
+        }
     }
-
-    // Get weekday headers and month name
-    val monthName = Month.of(selectedMonth).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-    val weekDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     LaunchedEffect(Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         currentUser?.uid?.let { uid ->
-            viewModel.fetchSavedDays(uid, FirebaseRepository(FirebaseFirestore.getInstance()))
+            moonViewModel.fetchSavedDays(uid, FirebaseRepository(FirebaseFirestore.getInstance()))
         }
     }
+
+
+    // Get weekday headers and month name
+    val monthName = Month.of(selectedMonth).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+    val weekDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     Scaffold(
         topBar = {
@@ -119,7 +124,6 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
         }
     ) { padding ->
         val daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
-        val firstDayOfMonth = LocalDate.of(selectedYear, selectedMonth, 1).dayOfWeek.value
 
         Column(
             modifier = Modifier
@@ -144,50 +148,75 @@ fun MoonListScreen(navController: NavController, viewModel: MoonViewModel) {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Adjust grid height to take up the full screen height
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxSize()
             ) {
+                // Calculate the first day offset (aligns with weekday headers)
+                val firstDayOffset = (LocalDate.of(selectedYear, selectedMonth, 1).dayOfWeek.value - 1) % 7
+
                 // Empty cells before the first day of the month
-                for (i in 1 until firstDayOfMonth) {
-                    item { Spacer(modifier = Modifier.size(40.dp)) }
+                for (i in 0 until firstDayOffset) {
+                    item {
+                        Spacer(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)) // Match cell height
+                    }
                 }
 
                 // Render days of the selected month
                 for (day in 1..daysInMonth) {
                     val currentDate = safeLocalDate(selectedYear, selectedMonth, day)
                     val isSaved = savedDays.contains(currentDate.toString())
-
+                    val hasNotes = notesDays.contains(currentDate.toString())
 
                     item {
                         Box(
                             modifier = Modifier
-                                .size(50.dp)
+                                .fillMaxWidth()
+                                .height(120.dp) // Ensure consistent height
                                 .clickable {
-                                    val currentUserEmail =
-                                        FirebaseAuth.getInstance().currentUser?.email
+                                    val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
                                     navController.navigate("secondScreen?email=${currentUserEmail ?: ""}&date=$currentDate")
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceEvenly, // Ensure even spacing
+                                modifier = Modifier.fillMaxHeight()
+                            ) {
+                                // Placeholder for the heart icon (Saved Day)
+                                if (isSaved) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Favorite,
+                                        contentDescription = "Saved Day",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = Color.Black
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.size(20.dp)) // Placeholder to keep alignment
+                                }
+
+                                // Day number
                                 Text(
                                     text = day.toString(),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = Color.Black
                                 )
-                                if (isSaved) {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Icon(
-                                        imageVector = Icons.Filled.Favorite,
-                                        contentDescription = "Saved Day",
-                                        modifier = Modifier
-                                            .size(16.dp)
-                                            .background(Color.Transparent),
-                                        tint = Color.Red // Material 3 now supports tint directly!
-                                    )
-                                }
 
+                                // Placeholder for the note icon
+                                if (hasNotes) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.note),
+                                        contentDescription = "Notes Present",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = Color.Black
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.size(20.dp)) // Placeholder to keep alignment
+                                }
                             }
                         }
                     }

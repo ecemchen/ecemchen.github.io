@@ -62,6 +62,7 @@ fun SecondScreen(
     // Initialize or fetch current user ID
     val firebaseRepository = FirebaseRepository(FirebaseFirestore.getInstance())
     val currentUser = FirebaseAuth.getInstance().currentUser
+    val uid = currentUser?.uid
 
     // Remember the current date state to react to navigation changes
     val currentDate: String = date ?: LocalDate.now().toString()
@@ -95,7 +96,7 @@ fun SecondScreen(
     val isLoadingAdvice = viewModel.isLoadingAdvice.collectAsState().value
 
 
-    // Track notes
+    /// Track notes and input states
     val notes = noteViewModel.notesForDate.collectAsState().value
     val noteInput = remember { mutableStateOf("") }
     val editingNote = remember { mutableStateOf<NoteEntity?>(null) }
@@ -124,7 +125,17 @@ fun SecondScreen(
         if (!date.isNullOrBlank()) {
             Log.d("SecondScreen", "Date changed to $date. Fetching new data.")
             viewModel.fetchZodiacAdvice(selectedZodiac ?: "", date)
-            noteViewModel.fetchNotesForDate(date)
+            uid?.let {
+                noteViewModel.fetchNotesForDate(it, date)
+                viewModel.fetchSavedDays(it, firebaseRepository)
+            }
+        }
+    }
+
+    // Fetch saved days when the date changes
+    LaunchedEffect(currentDate) {
+        uid?.let {
+            viewModel.fetchSavedDays(it, firebaseRepository)
         }
     }
 
@@ -141,7 +152,9 @@ fun SecondScreen(
 
     // Fetch notes when the date changes
     LaunchedEffect(currentDate) {
-        noteViewModel.fetchNotesForDate(currentDate)
+        uid?.let {
+            noteViewModel.fetchNotesForDate(it, currentDate)
+        }
     }
 
     // Fetch moon phases for the current month only once
@@ -443,13 +456,17 @@ fun SecondScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                                 Row {
-                                    IconButton(onClick = {
-                                        noteInput.value = note.content
-                                        editingNote.value = note
-                                    }) {
+                                    IconButton(
+                                        onClick = {
+                                            noteInput.value = note.content
+                                            editingNote.value = note
+                                        }
+                                    ) {
                                         Icon(Icons.Default.Edit, contentDescription = "Edit")
                                     }
-                                    IconButton(onClick = { noteViewModel.deleteNote(note) }) {
+                                    IconButton(onClick = {
+                                        uid?.let { noteViewModel.deleteNoteForDate(it, currentDate, note.content) }
+                                    }) {
                                         Icon(Icons.Default.Delete, contentDescription = "Delete")
                                     }
                                 }
@@ -459,7 +476,7 @@ fun SecondScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "ADD NOTE",
+                            text = if (editingNote.value == null) "ADD NOTE" else "EDIT NOTE",
                             style = MaterialTheme.typography.headlineMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
@@ -508,20 +525,27 @@ fun SecondScreen(
                             Button(
                                 onClick = {
                                     if (noteInput.value.isNotBlank()) {
-                                        if (editingNote.value != null) {
-                                            noteViewModel.updateNote(
-                                                editingNote.value!!.copy(content = noteInput.value)
-                                            )
-                                            editingNote.value = null
-                                        } else {
-                                            noteViewModel.addNote(
-                                                NoteEntity(
-                                                    date = date ?: "",
+                                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                                        if (uid != null) {
+                                            if (editingNote.value != null) {
+                                                // Update the note
+                                                noteViewModel.updateNoteForDate(
+                                                    uid = uid,
+                                                    date = currentDate,
+                                                    oldContent = editingNote.value!!.content,
+                                                    updatedContent = noteInput.value
+                                                )
+                                                editingNote.value = null // Clear editing state
+                                            } else {
+                                                // Add a new note
+                                                noteViewModel.addNoteForDate(
+                                                    uid = uid,
+                                                    date = currentDate,
                                                     content = noteInput.value
                                                 )
-                                            )
+                                            }
+                                            noteInput.value = "" // Clear the input field
                                         }
-                                        noteInput.value = ""
                                     }
                                 },
                                 modifier = Modifier.align(Alignment.Center),

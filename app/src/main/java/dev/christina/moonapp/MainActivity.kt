@@ -10,7 +10,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.firestore.FirebaseFirestore
 import dev.christina.moonapp.data.db.MoonDatabase
+import dev.christina.moonapp.repository.FirebaseRepository
 import dev.christina.moonapp.repository.MoonRepository
 import dev.christina.moonapp.repository.NoteRepository
 import dev.christina.moonapp.ui.*
@@ -24,7 +26,8 @@ class MainActivity : ComponentActivity() {
 
         val database = MoonDatabase.getDatabase(this)
         val moonRepository = MoonRepository(database.moonDao())
-        val noteRepository = NoteRepository(database.noteDao()) // Initialize NoteRepository
+        val firebaseRepository = FirebaseRepository(FirebaseFirestore.getInstance()) // Create FirebaseRepository
+        val noteRepository = NoteRepository(firebaseRepository) //
 
         setContent {
             MoonAppTheme {
@@ -69,7 +72,7 @@ fun MyApp(moonRepository: MoonRepository, noteRepository: NoteRepository) {
             SecondScreen(navController, moonViewModel, date, noteViewModel, email)
         }
         composable("moonList") {
-            MoonListScreen(navController, moonViewModel)
+            MoonListScreen(navController, moonViewModel, noteViewModel)
         }
         composable("profileSettingsScreen") {
             ProfileSettingsScreen(navController, moonViewModel)

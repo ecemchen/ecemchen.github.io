@@ -3,6 +3,8 @@ package dev.christina.moonapp.repository
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.YearMonth
 
 class FirebaseRepository(private val firestore: FirebaseFirestore) {
 
@@ -89,5 +91,20 @@ class FirebaseRepository(private val firestore: FirebaseFirestore) {
             .await()
         notesSnapshot.documents.forEach { it.reference.delete().await() }
     }
+
+    suspend fun getNotesForMonth(uid: String, yearMonth: YearMonth): List<String> {
+        val notesCollection = firestore.collection("users").document(uid).collection("notes")
+        val startDate = LocalDate.of(yearMonth.year, yearMonth.monthValue, 1)
+        val endDate = startDate.plusMonths(1).minusDays(1)
+
+        val snapshot = notesCollection
+            .whereGreaterThanOrEqualTo("date", startDate.toString())
+            .whereLessThanOrEqualTo("date", endDate.toString())
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { it.getString("date") }
+    }
+
 
 }
