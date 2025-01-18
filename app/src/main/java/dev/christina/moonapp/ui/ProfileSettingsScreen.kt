@@ -347,6 +347,7 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                     OutlinedButton(
                         onClick = {
                             firebaseAuth.signOut()
+                            moonViewModel.clearState()
                             navController.navigate("welcomeScreen") {
                                 popUpTo("welcomeScreen") { inclusive = true }
                             }

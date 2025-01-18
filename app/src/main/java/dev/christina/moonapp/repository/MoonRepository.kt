@@ -82,15 +82,17 @@ class MoonRepository(private val moonDao: MoonDao) {
     // Fetch Zodiac Advice
     suspend fun getZodiacAdvice(sign: String, day: String): ZodiacResponse? {
         return try {
-            Log.d("ZodiacAPI", "Fetching advice for sign: $sign, day: $day")
+            Log.d("ZodiacAPI", "Fetching daily advice for sign: $sign on day: $day") // Add this line
             val response = RetrofitInstance.zodiacApi.getZodiacAdvice(sign, day)
-            Log.d("ZodiacAPI", "API Response: $response")
+            Log.d("MoonRepository", "Fetched Zodiac Advice: ${response.data}")
             response
         } catch (e: Exception) {
-            Log.e("ZodiacAPI", "Error fetching advice: ${e.message}")
+            Log.e("MoonRepository", "Error fetching advice: ${e.message}")
             null
         }
     }
+
+
 }
 
 

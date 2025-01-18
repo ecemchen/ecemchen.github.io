@@ -29,13 +29,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dev.christina.moonapp.R
 import dev.christina.moonapp.data.db.NoteEntity
+import dev.christina.moonapp.repository.FirebaseRepository
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,12 +58,37 @@ fun SecondScreen(
             style = MaterialTheme.typography.titleLarge
         )
     }
-    val currentDate = date ?: LocalDate.now().toString()
+
+    // Initialize or fetch current user ID
+    val firebaseRepository = FirebaseRepository(FirebaseFirestore.getInstance())
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    // Remember the current date state to react to navigation changes
+    val currentDate: String = date ?: LocalDate.now().toString()
+
+
+    // Observe savedDaysList and determine if the current date is favorited
+    val savedDaysList by viewModel.savedDaysList.collectAsState()
+    val isFavorite = remember(savedDaysList, currentDate) {
+        savedDaysList.contains(currentDate)
+    }
+
+    LaunchedEffect(Unit) {
+        currentUser?.let { user ->
+            val uid = user.uid
+            if (viewModel.selectedZodiac.value.isNullOrBlank()) {
+                viewModel.getZodiacSign(uid, firebaseRepository)
+            }
+        }
+    }
+
+    val isCurrentDay = LocalDate.parse(currentDate).isEqual(LocalDate.now())
+
+
+    // Collect states from ViewModel
     val allMoonPhases = viewModel.allMoonPhases.collectAsState(emptyMap()).value
     val moonEntity = allMoonPhases[currentDate]
-
     val selectedZodiac = viewModel.selectedZodiac.collectAsState().value
-    Log.d("SecondScreen", "Selected Zodiac: $selectedZodiac")
     val zodiacAdvice = viewModel.zodiacAdvice.collectAsState().value
     val weeklyZodiacAdvice = viewModel.weeklyZodiacAdvice.collectAsState().value
     val monthlyZodiacAdvice = viewModel.monthlyZodiacAdvice.collectAsState().value
@@ -72,47 +99,60 @@ fun SecondScreen(
     val notes = noteViewModel.notesForDate.collectAsState().value
     val noteInput = remember { mutableStateOf("") }
     val editingNote = remember { mutableStateOf<NoteEntity?>(null) }
-    val isFavorite = viewModel.moonList.collectAsState().value.contains(moonEntity)
+
 
     // Option states for Daily, Weekly, Monthly advice
     val selectedOption = remember { mutableStateOf("Daily") }
     val dateRange = remember { mutableStateOf("") }
     val currentMonth = remember { mutableStateOf("") }
 
-    // Fetch zodiac advice when selectedZodiac or date changes
-    LaunchedEffect(selectedZodiac, currentDate) {
-          if (!selectedZodiac.isNullOrBlank()) {
-            viewModel.fetchZodiacAdvice(selectedZodiac, currentDate)
+
+    // Calculate Weekly Range or Month Name Dynamically
+    LaunchedEffect(selectedOption.value, currentDate) {
+        val localDate = LocalDate.parse(currentDate)
+        if (selectedOption.value == "Weekly") {
+            val startOfWeek = localDate.with(java.time.DayOfWeek.MONDAY)
+            val endOfWeek = localDate.with(java.time.DayOfWeek.SUNDAY)
+            dateRange.value = "${startOfWeek.dayOfMonth}.${startOfWeek.monthValue}.${startOfWeek.year} - " +
+                    "${endOfWeek.dayOfMonth}.${endOfWeek.monthValue}.${endOfWeek.year}"
+        } else if (selectedOption.value == "Monthly") {
+            currentMonth.value = localDate.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
         }
     }
 
-    // Track notes
+    LaunchedEffect(date) {
+        if (!date.isNullOrBlank()) {
+            Log.d("SecondScreen", "Date changed to $date. Fetching new data.")
+            viewModel.fetchZodiacAdvice(selectedZodiac ?: "", date)
+            noteViewModel.fetchNotesForDate(date)
+        }
+    }
+
+    // Fetch zodiac advice when selectedZodiac or currentDate changes
+    LaunchedEffect(selectedZodiac, currentDate) {
+        if (!selectedZodiac.isNullOrBlank()) {
+            Log.d("SecondScreen", "Fetching advice for zodiac: $selectedZodiac and date: $currentDate")
+            viewModel.fetchZodiacAdvice(selectedZodiac, currentDate)
+        } else {
+            Log.e("SecondScreen", "Selected Zodiac is null or blank, cannot fetch advice.")
+        }
+    }
+
+
+    // Fetch notes when the date changes
     LaunchedEffect(currentDate) {
         noteViewModel.fetchNotesForDate(currentDate)
     }
 
+    // Fetch moon phases for the current month only once
     LaunchedEffect(Unit) {
         val yearMonth = YearMonth.now()
         viewModel.fetchMoonPhasesForMonth(yearMonth)
     }
 
+    // Debug logging
     LaunchedEffect(Unit) {
-        viewModel.logAllMoonPhases() // This will log all moon phases from the database
-    }
-
-
-    // Calculate Weekly Range or Month Name Dynamically
-    LaunchedEffect(selectedOption.value, date) {
-        if (selectedOption.value == "Weekly" && date != null) {
-            val localDate = LocalDate.parse(date)
-            val startOfWeek = localDate.with(java.time.DayOfWeek.MONDAY)
-            val endOfWeek = localDate.with(java.time.DayOfWeek.SUNDAY)
-            dateRange.value = "${startOfWeek.dayOfMonth}.${startOfWeek.monthValue}.${startOfWeek.year} - " +
-                    "${endOfWeek.dayOfMonth}.${endOfWeek.monthValue}.${endOfWeek.year}"
-        } else if (selectedOption.value == "Monthly" && date != null) {
-            val localDate = LocalDate.parse(date)
-            currentMonth.value = localDate.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-        }
+        viewModel.logAllMoonPhases()
     }
 
     Scaffold(
@@ -150,7 +190,7 @@ fun SecondScreen(
                             }
                         }
                         Text(
-                            text = "MOON DETAILS",
+                            text = "YOUR HOROSCOPE",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Normal),
                             color = Color.Black
                         )
@@ -160,11 +200,12 @@ fun SecondScreen(
                     Row {
                         IconButton(
                             onClick = {
-                                moonEntity?.let {
+                                currentUser?.let { user ->
+                                    val uid = user.uid
                                     if (isFavorite) {
-                                        viewModel.removeFromMoonList(it)
+                                        viewModel.removeDayAsFavorite(uid, currentDate, firebaseRepository)
                                     } else {
-                                        viewModel.addToMoonList(it)
+                                        viewModel.saveDayAsFavorite(uid, currentDate, firebaseRepository)
                                     }
                                 }
                             }
@@ -174,10 +215,6 @@ fun SecondScreen(
                                 contentDescription = "Toggle Favorite",
                                 tint = Color.Black
                             )
-                        }
-
-                        IconButton(onClick = { navController.navigate("moonList") }) {
-                            Icon(Icons.Default.List, contentDescription = "Moon List", tint = Color.Black)
                         }
                     }
                 }
@@ -299,44 +336,55 @@ fun SecondScreen(
                         Spacer(modifier = Modifier.height(24.dp))
 
                         // Underlines for Daily, Weekly, Monthly
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
-                        ) {
+                        if (isCurrentDay) {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+                            ) {
+                                Text(
+                                    text = "Daily",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        textDecoration = if (selectedOption.value == "Daily") TextDecoration.Underline else TextDecoration.None,
+                                        color = if (selectedOption.value == "Daily") Color.Black else Color.Gray
+                                    ),
+                                    modifier = Modifier.clickable {
+                                        selectedOption.value = "Daily"
+                                        viewModel.fetchZodiacAdvice(selectedZodiac ?: "", date ?: "")
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(
+                                    text = "Weekly",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        textDecoration = if (selectedOption.value == "Weekly") TextDecoration.Underline else TextDecoration.None,
+                                        color = if (selectedOption.value == "Weekly") Color.Black else Color.Gray
+                                    ),
+                                    modifier = Modifier.clickable {
+                                        selectedOption.value = "Weekly"
+                                        viewModel.fetchWeeklyZodiacAdvice(selectedZodiac ?: "", week = "1")
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(
+                                    text = "Monthly",
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        textDecoration = if (selectedOption.value == "Monthly") TextDecoration.Underline else TextDecoration.None,
+                                        color = if (selectedOption.value == "Monthly") Color.Black else Color.Gray
+                                    ),
+                                    modifier = Modifier.clickable {
+                                        selectedOption.value = "Monthly"
+                                        viewModel.fetchMonthlyZodiacAdvice(selectedZodiac ?: "")
+                                    }
+                                )
+                            }
+                        } else {
                             Text(
                                 text = "Daily",
                                 style = MaterialTheme.typography.bodyLarge.copy(
-                                    textDecoration = if (selectedOption.value == "Daily") TextDecoration.Underline else TextDecoration.None,
-                                    color = if (selectedOption.value == "Daily") Color.Black else Color.Gray
+                                    textDecoration = TextDecoration.Underline,
+                                    color = Color.Black
                                 ),
-                                modifier = Modifier.clickable {
-                                    selectedOption.value = "Daily"
-                                    viewModel.fetchZodiacAdvice(selectedZodiac ?: "", date ?: "")
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(
-                                text = "Weekly",
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    textDecoration = if (selectedOption.value == "Weekly") TextDecoration.Underline else TextDecoration.None,
-                                    color = if (selectedOption.value == "Weekly") Color.Black else Color.Gray
-                                ),
-                                modifier = Modifier.clickable {
-                                    selectedOption.value = "Weekly"
-                                    viewModel.fetchWeeklyZodiacAdvice(selectedZodiac ?: "", week = "1")
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(
-                                text = "Monthly",
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    textDecoration = if (selectedOption.value == "Monthly") TextDecoration.Underline else TextDecoration.None,
-                                    color = if (selectedOption.value == "Monthly") Color.Black else Color.Gray
-                                ),
-                                modifier = Modifier.clickable {
-                                    selectedOption.value = "Monthly"
-                                    viewModel.fetchMonthlyZodiacAdvice(selectedZodiac ?: "")
-                                }
+                                modifier = Modifier.padding(vertical = 16.dp)
                             )
                         }
 
@@ -346,6 +394,7 @@ fun SecondScreen(
                         Text(
                             text = when {
                                 isLoadingAdvice -> "Loading..."
+                                LocalDate.parse(currentDate).isAfter(LocalDate.now()) -> "Horoscope is not available."
                                 zodiacAdvice?.data != null -> "\"${zodiacAdvice.data.horoscope_data}\""
                                 weeklyZodiacAdvice?.data != null -> "\"${weeklyZodiacAdvice.data.horoscope_data}\""
                                 monthlyZodiacAdvice?.data != null -> "\"${monthlyZodiacAdvice.data.horoscope_data}\""
@@ -358,6 +407,7 @@ fun SecondScreen(
                             ),
                             textAlign = TextAlign.Center
                         )
+
 
                         Spacer(modifier = Modifier.height(24.dp))
 
@@ -493,8 +543,8 @@ fun SecondScreen(
 fun getMoonPhaseImageResource(phase: String): Int {
     return when (phase) {
         "Full Moon" -> R.drawable.moon_phases_fullmoon
-        "First Quarter" -> R.drawable.moon_phases_firstquarter
-        "Third Quarter" -> R.drawable.moon_phases_thirdquarter
+        "First Quarter", "1st Quarter" -> R.drawable.moon_phases_firstquarter
+        "Third Quarter", "3rd Quarter" -> R.drawable.moon_phases_thirdquarter
         "New Moon" -> R.drawable.moon_phases_newmoon
         "Dark Moon" -> R.drawable.moon_phases_newmoon
         "Waning Gibbous" -> R.drawable.moon_phases_waninggibbous
@@ -542,4 +592,3 @@ fun BottomNavigationBar(navController: NavController, currentScreen: String) {
 }
 
 data class BottomNavItem(val label: String, val icon: Int, val route: String)
-
