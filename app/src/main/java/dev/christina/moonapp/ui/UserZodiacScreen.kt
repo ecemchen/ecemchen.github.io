@@ -34,7 +34,7 @@ fun UserZodiacScreen(navController: NavController, zodiacSign: String) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Your Zodiac Sign",
+                    text = "YOUR ZODIAC SIGN",
                     style = MaterialTheme.typography.headlineLarge,
                 )
 
