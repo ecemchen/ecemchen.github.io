@@ -342,7 +342,7 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                     ) {
-                        Text("Save Changes", color = Color.White)
+                        Text("SAVE CHANGES", color = Color.White, fontWeight = FontWeight.Normal)
                     }
                     OutlinedButton(
                         onClick = {
@@ -362,9 +362,9 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                         )
                     ) {
                         Text(
-                            text = "Logout",
+                            text = "LOGOUT",
                             color = Color.Black,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Normal
                         )
                     }
                 }

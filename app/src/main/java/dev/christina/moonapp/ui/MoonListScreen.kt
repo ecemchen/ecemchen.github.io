@@ -64,7 +64,7 @@ fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, n
         }
     }
 
-    val monthName = Month.of(selectedMonth).getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+    val monthName = Month.of(selectedMonth).getDisplayName(TextStyle.FULL, Locale.ENGLISH).uppercase()
     val weekDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     Scaffold(
@@ -94,7 +94,7 @@ fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, n
                         Text(
                             text = "$monthName $selectedYear",
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Normal, // Normal weight
                             color = Color.Black
                         )
                         Spacer(modifier = Modifier.width(16.dp))
@@ -181,7 +181,7 @@ fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, n
                                 .height(120.dp)
                                 .background(if (isToday) todayBackgroundColor else Color.Transparent), // Highlight current day
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.SpaceEvenly // Ensures even spacing
                         ) {
                             // Centered day with heart icon
                             Box(
@@ -199,30 +199,30 @@ fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, n
                                         imageVector = Icons.Filled.Favorite,
                                         contentDescription = "Saved Day",
                                         modifier = Modifier.size(40.dp), // Heart icon size
-                                        tint = Color.Black
+                                        tint = Color.LightGray // Changed to gray
                                     )
                                 }
                                 // Day number always centered
                                 Text(
                                     text = day.toString(),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (isSaved) Color.White else Color.Black,
+                                    color = if (isSaved) Color.Black else Color.Black,
                                     fontWeight = FontWeight.Normal
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(4.dp)) // Spacing between day and note
-
-                            // Note icon appears only if hasNotes is true
+                            // Note icon placed closer to the day number
                             if (hasNotes) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.note),
                                     contentDescription = "Notes Present",
-                                    modifier = Modifier.size(24.dp),
-                                    tint = Color.Black
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .padding(top = 1.dp), // Positioned closer to the number
+                                    tint = Color.Gray
                                 )
                             } else {
-                                Spacer(modifier = Modifier.height(24.dp)) // Placeholder to maintain alignment
+                                Spacer(modifier = Modifier.height(24.dp)) // Placeholder for alignment
                             }
                         }
 

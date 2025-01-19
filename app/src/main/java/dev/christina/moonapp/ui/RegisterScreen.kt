@@ -227,7 +227,7 @@ fun RegisterScreen(navController: NavController) {
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                     ) {
-                        Text("Register", color = Color.White)
+                        Text("REGISTER", color = Color.White)
                     }
 
                 }

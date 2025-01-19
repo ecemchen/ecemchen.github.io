@@ -72,7 +72,7 @@ fun WelcomeScreen(navController: NavController) {
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
-                    Text("Register", color = Color.White)
+                    Text("REGISTER", color = Color.White, fontWeight = FontWeight.Normal)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -87,9 +87,9 @@ fun WelcomeScreen(navController: NavController) {
                     border = BorderStroke(2.dp, Color.Black)
                 ) {
                     Text(
-                        text = "Log In",
+                        text = "LOGIN",
                         color = Color.Black,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
