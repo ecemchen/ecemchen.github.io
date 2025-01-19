@@ -603,11 +603,13 @@ fun BottomNavigationBar(navController: NavController, currentScreen: String) {
                         }
                     }
                 ) {
+                    // Set a larger size for the "Horoscope" icon
+                    val iconSize = if (item.label == "Horoscope") 36.dp else 32.dp
                     Icon(
                         painter = painterResource(id = item.icon),
                         contentDescription = item.label,
                         tint = if (currentScreen == item.route) Color.Black else Color.Gray,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(iconSize)
                     )
                 }
             }
