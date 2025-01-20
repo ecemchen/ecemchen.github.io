@@ -240,7 +240,14 @@ bottomBar = {
             .fillMaxSize()
             .padding(padding)
     ) {
-        if (moonEntity != null) {
+        if (moonEntity == null || selectedZodiac.isNullOrBlank() ) {
+            Text(
+                text = "Loading content, please wait...",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Gray,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        } else {
             Card(
                 modifier = Modifier
                     .fillMaxSize()
