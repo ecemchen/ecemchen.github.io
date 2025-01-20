@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
@@ -102,10 +104,12 @@ fun ProfileSettingsScreen(navController: NavController, moonViewModel: MoonViewM
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()) // Enable vertical scrolling
                         .padding(horizontal = 16.dp, vertical = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                )
+                {
                     successMessage?.let { message ->
                         Text(
                             text = message,
