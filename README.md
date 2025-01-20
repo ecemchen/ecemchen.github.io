@@ -7,3 +7,4 @@
 ![6](https://github.com/user-attachments/assets/c2a96ee9-6060-47ea-9c04-4a23e051b419)
 ![7](https://github.com/user-attachments/assets/ca6676a3-6341-4137-9a71-670300057743)
 ![8](https://github.com/user-attachments/assets/69e36dfc-85fd-4ae2-af8a-24af48adad71)
+[example.pdf](https://github.com/user-attachments/files/18476183/example.pdf)
