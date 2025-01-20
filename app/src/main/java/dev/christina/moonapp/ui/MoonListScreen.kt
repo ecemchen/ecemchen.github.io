@@ -86,7 +86,7 @@ fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, n
                                     selectedYear--
                                 }
                             },
-                            modifier = Modifier.border(BorderStroke(1.dp, Color.Black), CircleShape)
+                            modifier = Modifier.border(BorderStroke(0.5.dp, Color.Black), CircleShape)
                         ) {
                             Text("<", color = Color.Black)
                         }
@@ -218,15 +218,18 @@ fun MoonListScreen(navController: NavController, moonViewModel: MoonViewModel, n
                                     contentDescription = "Notes Present",
                                     modifier = Modifier
                                         .size(24.dp)
-                                        .padding(top = 1.dp), // Positioned closer to the number
+                                        .padding(top = 1.dp),
                                     tint = Color.Gray
                                 )
                             } else {
-                                Spacer(modifier = Modifier.height(24.dp)) // Placeholder for alignment
+                                Spacer(modifier = Modifier.height(24.dp))
                             }
                         }
 
-                        Divider(color = Color.Black, thickness = 0.5.dp) // Add horizontal divider
+                        HorizontalDivider(
+                            thickness = 0.5.dp,
+                            color = Color.Black
+                        )
                     }
                 }
             }
