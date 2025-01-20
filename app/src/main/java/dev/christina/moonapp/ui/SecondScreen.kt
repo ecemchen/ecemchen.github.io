@@ -266,14 +266,14 @@ bottomBar = {
                     Image(
                         painter = painterResource(id = moonImage),
                         contentDescription = "Moon Phase Image",
-                        modifier = Modifier.size(200.dp).padding(bottom = 16.dp)
+                        modifier = Modifier.size(150.dp).padding(bottom = 16.dp)
                     )
 
                     Text(
                         text = moonEntity.phase,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Light,
-                            fontSize = 40.sp,
+                            fontSize = 28.sp,
                             color = Color.Black
                         )
                     )
@@ -285,7 +285,7 @@ bottomBar = {
                                 text = dayOfWeek,
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontWeight = FontWeight.Normal,
-                                    fontSize = 20.sp,
+                                    fontSize = 18.sp,
                                     color = Color.Black
                                 )
                             )
@@ -293,7 +293,7 @@ bottomBar = {
                                 text = "$day",
                                 style = MaterialTheme.typography.headlineLarge.copy(
                                     fontWeight = FontWeight.Light,
-                                    fontSize = 80.sp,
+                                    fontSize = 70.sp,
                                     color = Color.Black
                                 )
                             )
@@ -314,7 +314,7 @@ bottomBar = {
                                     color = Color.Black
                                 )
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = dateRange.value,
                                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -332,7 +332,7 @@ bottomBar = {
                                     color = Color.Black
                                 )
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = currentMonth.value.uppercase(),
                                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -344,7 +344,7 @@ bottomBar = {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
                     // Underlines for Daily, Weekly, Monthly
                     if (isCurrentDay) {
