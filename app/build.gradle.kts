@@ -72,7 +72,7 @@ dependencies {
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:20.6.0")
 
-    // Navigation Compose (latest version)
+    // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.8.4")
 
     // Retrofit for Networking
@@ -88,27 +88,28 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.3.1")
     implementation("androidx.compose.foundation:foundation:1.5.2")
 
-    // Other Jetpack Compose Libraries
-    implementation(libs.androidx.ui) // UI components
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
+    // Jetpack Compose UI Components
+    implementation("androidx.compose.ui:ui:1.5.2")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.2")
+    implementation("androidx.compose.ui:ui-graphics:1.5.2")
 
     // Lifecycle and Activity Compose
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.0")
 
     // Firebase KTX Libraries
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.common.ktx)
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-common-ktx")
 
     // Testing Dependencies
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.compose.bom)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Compose Testing Dependencies
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.2")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.2")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.2")
 }
