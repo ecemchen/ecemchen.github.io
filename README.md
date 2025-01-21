@@ -6,8 +6,8 @@
 
 ## MoonApp
 **Team members:**
-Ecem Tasali
-Milena Biasova
+Ecem Tasali -
+Milena Biasova -
 Christina Gamperl
 
 **MoonApp APK**  
