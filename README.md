@@ -8,7 +8,7 @@
 
 **MoonApp** makes it easy to explore moon phases and get daily zodiac insights tailored to you. View a calendar of lunar details, save your favorite days, and add personal notes. Choose your zodiac sign to get advice and mood tips for each day.
 
-**App concept:**[App Concept](https://github.com/user-attachments/files/18476226/MoonApp_Christina.Milena.Ecem.pdf)  
+**App concept:**  [App Concept document](https://github.com/user-attachments/files/18476226/MoonApp_Christina.Milena.Ecem.pdf)  
 
 **Team members:**
 Ecem Tasali -
