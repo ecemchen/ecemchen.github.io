@@ -1,7 +1,9 @@
 # ecemchen.github.io
+
 <p align="center">
-![logo](https://github.com/user-attachments/assets/9b19c52c-277b-4d24-b316-07b095792f32)
+  <img src="https://github.com/user-attachments/assets/9b19c52c-277b-4d24-b316-07b095792f32" alt="logo"/>
 </p>
+
 [App Concept](https://github.com/user-attachments/files/18476226/MoonApp_Christina.Milena.Ecem.pdf)
 
 [Expert Review](https://github.com/user-attachments/files/18478607/expert_interview.pdf)
