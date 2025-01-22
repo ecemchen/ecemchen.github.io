@@ -30,6 +30,60 @@ Christina Gamperl
 ## Results & Improvements
 
 ## Design of the database
+The MoonApp database design combines local storage, cloud storage, and remote APIs to deliver a dynamic user experience. The architecture ensures offline accessibility for moon phase data, centralized cloud storage for user-specific data, and real-time fetching of zodiac and moon phase details from external sources.
+
+### 1. Room Database (Local Storage)
+The Room Database is used for storing moon phases and user notes locally on the device. 
+It has the following structure/table: 
+
+1. moon_phases
+- Primary Key: date (String)
+- Columns:
+  - date: String, format YYYY-MM-DD
+  - phase: String, moon phase name
+  - illumination: Double, percentage illumination
+  - isFavorited: Boolean, whether the day is marked as favorite
+  - zodiacSign: String (nullable), zodiac sign associated with the moon phase
+  - advice: String (nullable), advice based on the moon phase and zodiac
+  - mood: String (nullable), mood for the day based on the moon phase and zodiac
+
+### 2. Firebase Firestore (Cloud Storage)
+Firebase Firestore is used to manage user data, including registration information, saved favorite days, and notes.
+
+1. users (Main Collection)
+- Document ID: User's UID (Unique Identifier from Firebase Auth)
+- Fields:
+  - uid: String, Firebase user ID
+  - birthdate: String, format YYYY-MM-DD
+  - email: String, user's email
+  - zodiacSign: String, zodiac sign derived from birthdate
+  - savedDays: List<String>, favorite days saved by the user in the format YYYY-MM-DD
+
+2. users/{uid}/notes (Sub-Collection for Notes)
+- Fields for Each Document:
+  - date: String, format YYYY-MM-DD
+  - content: String, note content
+
+### 3. Remote APIs
+The app integrates with two external APIs to fetch moon phase details and zodiac advice.
+
+1. FarmSense API
+- Fetches moon phase details based on a timestamp and location.
+- Data Fields:
+  - TargetDate: Date of the moon phase
+  - Phase: Moon phase name
+  - Illumination: Percentage of the moon illuminated
+
+2. Horoscope API
+- Fetches daily, weekly, and monthly zodiac advice based on the zodiac sign.
+- Data Fields:
+  - date: Date for the advice
+  - horoscope_data: Advice text
+ 
+#### Entity-Relationship-Diagram
+The following diagram illustrates the database architecture of the MoonApp, showcasing the relationships between entities and APIs:
+![Entity-Relationship-Diagram](https://github.com/user-attachments/assets/0186c94b-ad49-4246-bc16-bbb364aaf7ff)
+
 
 ## Final Reflection
 Ecem Tasali:
