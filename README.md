@@ -15,7 +15,8 @@ Ecem Tasali -
 Milena Biasova -
 Christina Gamperl
 
-**MoonApp APK:**  [Download the Zip file here](https://github.com/user-attachments/files/18492434/app-release.apk.zip)
+**MoonApp APK:**  [Download Zip file here to get APK file](https://github.com/user-attachments/files/18503868/app-release.apk.zip)
+
 
 ## Expert Interview
 [Expert Interview](https://github.com/user-attachments/files/18478607/expert_interview.pdf)  
