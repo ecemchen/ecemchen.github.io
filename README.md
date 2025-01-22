@@ -34,7 +34,11 @@ Christina Gamperl
 ## Final Reflection
 Ecem Tasali:
 
-Milena Biasova:
+Milena Biasova: Working on the MoonApp project was definitely challenging, but also really rewarding. I focused on developing the second screen, adding the calendar view, and working on the app’s design. I also handled the integration of the horoscope API, which was a cool experience but not without its struggles.
+
+The biggest challenge for me was getting comfortable with Firebase. It was my first time working with it, and trying to understand how user authentication and moving data from Room to Firebase work was harder than I expected. Fetching data from the horoscope API was another tricky part but figured it out.
+
+I also learned a lot about using Git during this project. At first, I wasn’t super confident, but now I feel way more comfortable with version control and teamwork. Overall, this project helped me grow a lot, both technically and personally, and I’m proud of what I accomplished.
 
 Christina Gamperl:
 
