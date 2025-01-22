@@ -86,14 +86,25 @@ The following diagram illustrates the database architecture of the MoonApp, show
 
 
 ## Final Reflection
-Ecem Tasali:
 
-Milena Biasova: Working on the MoonApp project was definitely challenging, but also really rewarding. I focused on developing the second screen, adding the calendar view, and working on the app’s design. I also handled the integration of the horoscope API, which was a cool experience but not without its struggles.
+### Ecem Tasali:
+
+### Milena Biasova: 
+Working on the MoonApp project was definitely challenging, but also really rewarding. I focused on developing the second screen, adding the calendar view, and working on the app’s design. I also handled the integration of the horoscope API, which was a cool experience but not without its struggles.
 
 The biggest challenge for me was getting comfortable with Firebase. It was my first time working with it, and trying to understand how user authentication and moving data from Room to Firebase work was harder than I expected. Fetching data from the horoscope API was another tricky part but figured it out.
 
 I also learned a lot about using Git during this project. At first, I wasn’t super confident, but now I feel way more comfortable with version control and teamwork. Overall, this project helped me grow a lot, both technically and personally, and I’m proud of what I accomplished.
 
-Christina Gamperl:
+### Christina Gamperl:
+Working on MoonApp was both challenging and a good learning experience. The original app, created during the Mobile Coding class, stored everything locally using Room Database. I restructured it to use Firebase Firestore, allowing data like saved days and notes to sync across devices.
+
+I worked on creating the login and registration features, where users can sign up with their email, password, and birthdate. I also styled the calendar view to make it simple and easy to use. Transitioning from local storage to Firebase took some time and effort, as I had to learn how to manage cloud-based data effectively. Additionally, I helped organize the Git repository for better collaboration.
+
+Although there were challenges, like debugging and figuring out Firebase integration, the process helped me improve my skills in backend systems and teamwork. While there is still room for improvement, I think we created a solid foundation for MoonApp.
+
+
+
+
 
 
