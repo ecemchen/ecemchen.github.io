@@ -17,7 +17,6 @@ Christina Gamperl
 
 **MoonApp APK:**  [Download Zip file here to get APK file](https://github.com/user-attachments/files/18503868/app-release.apk.zip)
 
-
 ## Expert Interview
 [Expert Interview](https://github.com/user-attachments/files/18478607/expert_interview.pdf)  
 
@@ -25,7 +24,8 @@ Christina Gamperl
 [Heuristic Evaluation](https://github.com/user-attachments/files/18478567/Heuristic.Evaluation.pdf)  
 
 ## Usability Test Plan
-[User Test Design](https://github.com/user-attachments/files/18616052/CCL3.MoonApp.User.Test.Design.pdf)
+[User Test Design](https://github.com/user-attachments/files/18618028/CCL3.MoonApp.User.Test.Design.1.pdf)
+
 
 
 ## Results & Improvements
