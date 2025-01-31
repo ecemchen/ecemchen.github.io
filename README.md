@@ -1,4 +1,4 @@
-# ecemchen.github.io
+[results_usabilitytest_MoonApp.csv](https://github.com/user-attachments/files/18618233/results_usabilitytest_MoonApp.csv)# ecemchen.github.io
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/9b19c52c-277b-4d24-b316-07b095792f32" alt="logo"/>
@@ -27,9 +27,20 @@ Christina Gamperl
 [User Test Design](https://github.com/user-attachments/files/18618028/CCL3.MoonApp.User.Test.Design.1.pdf)
 
 ## Results & Improvements
-[Final usability test report MoonApp.pdf](https://github.com/user-attachments/files/18618076/Final.usability.test.report.MoonApp.pdf)
-[Uploading results_usabilitytest_MoonApp.csv…]()
+[Test report MoonApp](https://github.com/user-attachments/files/18618076/Final.usability.test.report.MoonApp.pdf)
 
+
+[UploTimestamp,How old are you?,What is your gender?,How easy or difficult was it to complete the registration process and understand your zodiac sign?,What could be improved about the registration and zodiac sign process?,"How easy or difficult was it to understand the daily, weekly and monthly advice displayed?","Did the default screen meet your expectations? If not, what could be improved?",How easy or difficult was it to add a day as a favorite?,Was it clear that the day was added as a favorite and easy to find in the calendar?,How easy or difficult was it to add a note?,Where there any steps that felt unclear or unnecessary?,How easy or difficult was it to change your profile settings?,What challenges did you face in modifying your settings?,How easy or difficult was it to add a note?,Was it easy to find the note in the calendar?,How easy or difficult  was it to find the logout and login button?,Were there any steps that felt unclear or unnecessary?,Did you encounter any other issues or have any suggestions for improving the MoonApp that we haven't covered in the tasks?
+21/01/2025 15:25:10,21,female,4,"when i finish writing in a text field and i click enter, it does not close the keyboard. maybe a quicker selection/picker for the birth year etc would be cool (right now i have to click the arrows loads of times) but thats not necessary ",4,"Yes, it looked very nice! The monthly text was a bit difficult to understand as it uses lots of astrology terminology that some people might not know. I also encountered a bug when sometimes it was showing me eg the weekly text in the daily tab, or the monthly text in the weekly tab, and so on",2,"It was clear to see that it is saved but I got confused trying to look for the “favourite” button. I thought the “save” button to save a note was what I was supposed to do, and I did not look in the tabbar to find the heart button",,,5,"none, maybe i would remove the text field focus after saving the changes",5,yes,5,"when i clicked enter to get out of the password text field, it added an empty character, which i dont think should happen. also i am not sure if i get a feedback when i log in with the wrong password, as it was just loading for me until i went back to put in the password correctly ","on the horoscope page I thought i could add 3 different types of notes: one for the day, one for the week and one for the month. however, it will only add the note to the day. idk how you could do it differently at the moment though "
+21/01/2025 21:11:11,32,male,5,Short Info about the sign,5,Yes,5,Yes,,,3,"ON my vivox100 i have a blackscreen the color of the Numbers and Background is black ,hard to See the Numbers /settings",5,Was clear and smooth,4,No,"The Birthday settings was hard to edit, anything Else was smooth and Well made"
+23/01/2025 12:18:35,24,male,4,"The older you are, the more years you have to click back. Maybe you could introduce have an additional scollable list for the years",3,It would be cool to have an info screen. I don't know much about crescents or opposing marses :(,5,Yes,,,5, ,4, ,5,No,Add more informations for dumb people
+23/01/2025 22:34:07,38,male,4,"Privacy and security on starting of App.
+",4,"yes, it is very good",5,yes it is,,,5,easy acess to settings.,5,yes it was,1,There was not dificult to find logout but there was not login.,"
+At first, everything is fine, but I would like a sensor to be implemented to automatically determine the temperature, as well as better adjust the main screen."
+23/01/2025 23:23:03,21,male,4,The requirements for the password should be displayed,5,The screen was well designed,4,The icon could be a little bigger ,,,5,Very simple,5,It was simple,5,The location was expected,No the only thing was the password requirements were not explicit 
+24/01/2025 00:56:24,24,male,4,i think it was fairly easy,4,yes it di,4,yes,,,4,didnt change much but it seemed straigh forward,4,yes,5,"no,not realy",
+24/01/2025 10:58:52,21,male,5,idk,5,yes,5,yes,,,5,no challenges,5,yes,5,no,
+24/01/2025 18:23:24,21,male,5,nothing,4,"Yes, it did, and I wouldn’t change anything.",5,It was very practical and easy to find.,,,5,none,4,"yes, it was",4,"In my view, none",ading results_usabilitytest_MoonApp.csv…]()
 
 
 ## Design of the database
