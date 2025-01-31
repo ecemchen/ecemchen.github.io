@@ -25,7 +25,8 @@ Christina Gamperl
 [Heuristic Evaluation](https://github.com/user-attachments/files/18478567/Heuristic.Evaluation.pdf)  
 
 ## Usability Test Plan
-[User Test Design](https://github.com/user-attachments/files/18492322/CCL3.MoonApp.User.Test.Design.1.pdf)  
+[User Test Design](https://github.com/user-attachments/files/18616052/CCL3.MoonApp.User.Test.Design.pdf)
+
 
 ## Results & Improvements
 
