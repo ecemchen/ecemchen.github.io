@@ -26,9 +26,11 @@ Christina Gamperl
 ## Usability Test Plan
 [User Test Design](https://github.com/user-attachments/files/18618028/CCL3.MoonApp.User.Test.Design.1.pdf)
 
-
-
 ## Results & Improvements
+[Final usability test report MoonApp.pdf](https://github.com/user-attachments/files/18618076/Final.usability.test.report.MoonApp.pdf)
+[Uploading results_usabilitytest_MoonApp.csv…]()
+
+
 
 ## Design of the database
 The MoonApp database design combines local storage, cloud storage, and remote APIs to deliver a dynamic user experience. The architecture ensures offline accessibility for moon phase data, centralized cloud storage for user-specific data, and real-time fetching of zodiac and moon phase details from external sources.
@@ -89,6 +91,11 @@ The following diagram illustrates the database architecture of the MoonApp, show
 ## Final Reflection
 
 ### Ecem Tasali:
+Working on the MoonApp project was both challenging and rewarding. I focused on the heuristic evaluation, analyzing usability issues, and working on the calendar view. Identifying small but impactful UX problems, like missing loading indicators or unclear icons, was an interesting process.
+
+On the development side, implementing the calendar’s favorite days and notes feature came with its own challenges, especially ensuring everything displayed correctly. Debugging and improving the UI helped me learn a lot about state management and user interaction.
+
+The hardest part was making sense of qualitative feedback—some responses were detailed, while others were vague. Overall, this project improved both my UX analysis and coding skills, and I’m happy with what we accomplished.
 
 ### Milena Biasova: 
 Working on the MoonApp project was definitely challenging, but also really rewarding. I focused on developing the second screen, adding the calendar view, and working on the app’s design. I also handled the integration of the horoscope API, which was a cool experience but not without its struggles.
